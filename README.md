@@ -8,14 +8,14 @@
 - **배경:** SDV(Software Defined Vehicle) 시대로의 전환에 따라 주행 중 대용량 펌웨어 업데이트의 중요성 증대.
 - **문제점:** RSU 설치 비용 제약으로 인해 전역 탐색(Grid Search) 시 시간 복잡도($O(N \times M)$) 폭발 발생.
 - **목표:** 1. 실제 도로 네트워크 데이터를 활용한 **지도 기반 후보지 축소(Spatial Filtering)** 기법 제안.
-  2. **Brute-Force(전수 조사)**와 **Meta-Heuristics(SA, Greedy)** 알고리즘의 성능 및 연산 시간 비교 분석.
+  2. **Brute-Force(전수 조사)** 와 **Meta-Heuristics(SA, Greedy)** 알고리즘의 성능 및 연산 시간 비교 분석.
   3. OTA 완료 차량 수를 최대화하는 최적의 RSU 배치 안 도출.
 
 ---
 
 ## 2. 제안 기법 (Proposed Methodology)
 
-### A. RSU 후보지 생성 및 지도 기반 축소 ($C \rightarrow C_{80}$)
+### A. RSU 후보지 생성 및 지도 기반 축소 ($C \rightarrow C_{27}$)
 단순 격자 방식의 비효율성을 개선하기 위해 도로망의 정적 정보만을 활용하여 후보지를 27개로 선별합니다.
 - **기준:** 교차로 유형(Traffic Light), 진입 차로 수(incLanes), 교차로 차수(Degree), 주변 교차로 수(Density), 커버리지 반경 중복율
 - **공간 분산:** 후보지 간 최소 거리($d_{min} = 150m$) 제약을 두어 특정 지역 쏠림 현상 방지.
