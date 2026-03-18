@@ -29,8 +29,8 @@
 | 비교 항목 | 방식 A: 전역 격자 탐색 (Baseline) | 방식 B: 제안 기법 (Proposed) |
 | :--- | :--- | :--- |
 | **탐색 범위** | Target Area 전체 $N \times M$ 격자 | 실제 도로 네트워크의 **교차지점(Intersection)** |
-| **알고리즘** | Brute-Force (전수 조사) | **Greedy, Simulated Annealing (SA)** |
-| **시간 복잡도** | 매우 높음 ($O(N \times M)$) | 낮음 ($O(|C_{80}|)$) |
+| **알고리즘** | Brute-Force (전수 조사) | **Brute-Force, GA, Simulated Annealing (SA)** |
+| **시간 복잡도** | 매우 높음 ($O(N \times M)$) | 낮음 ($O(|C_{27}|)$) |
 | **정확도** | 이론적 전역 최적해 도출 | 전역 최적해에 근접한 **부분 최적해** |
 
 ---
