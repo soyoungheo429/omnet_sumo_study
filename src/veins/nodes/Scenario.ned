@@ -36,6 +36,7 @@ network Scenario
         double playgroundSizeX @unit(m); // x size of the area the nodes are in (in meters)
         double playgroundSizeY @unit(m); // y size of the area the nodes are in (in meters)
         double playgroundSizeZ @unit(m); // z size of the area the nodes are in (in meters)
+        //int numRSUs = default(0);
         @display("bgb=dropUnit($playgroundSizeX),dropUnit($playgroundSizeY)");
     submodules:
         obstacles: ObstacleControl {
@@ -62,6 +63,8 @@ network Scenario
         roadsCanvasVisualizer: RoadsCanvasVisualizer {
             @display("p=300,0");
         }
+        //rsu[numRSUs]: RSU {
+            //@display("p=150,148;is=s");
         node[0]: Car {
         }
 

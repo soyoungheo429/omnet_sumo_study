@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2026-03-16 13:09:50 by Eclipse SUMO duarouter Version 1.11.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/duarouterConfiguration.xsd">
+
+    <input>
+        <net-file value="erlangen.net.xml"/>
+        <route-files value="trips.trips.xml"/>
+    </input>
+
+    <output>
+        <output-file value="trips.trips.xml.tmp"/>
+        <write-trips value="true"/>
+    </output>
+
+    <time>
+        <begin value="0"/>
+        <end value="1"/>
+    </time>
+
+    <report>
+        <no-warnings value="true"/>
+        <ignore-errors value="true"/>
+        <no-step-log value="true"/>
+    </report>
+
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <trip id="0" depart="0.00" departLane="best" departPos="random" departSpeed="max" from="-3998615#1" to="113939242#1"/>
+    <trip id="1" depart="0.02" departLane="best" departPos="random" departSpeed="max" from="-8402998#3" to="31241855#1"/>
+    <trip id="2" depart="0.04" departLane="best" departPos="random" departSpeed="max" from="31720632#0" to="29900564#1"/>
+    <trip id="3" depart="0.06" departLane="best" departPos="random" departSpeed="max" from="-31241853#2" to="4006693#0"/>
+    <trip id="4" depart="0.08" departLane="best" departPos="random" departSpeed="max" from="28269598" to="-4006683"/>
+    <trip id="5" depart="0.10" departLane="best" departPos="random" departSpeed="max" from="23805514#1" to="-10425128#0"/>
+    <trip id="6" depart="0.12" departLane="best" departPos="random" departSpeed="max" from="4797871" to="-31241838#0"/>
+    <trip id="7" depart="0.14" departLane="best" departPos="random" departSpeed="max" from="-4047532" to="-3998615#0"/>
+    <trip id="8" depart="0.16" departLane="best" departPos="random" departSpeed="max" from="3013107" to="9643180"/>
+    <trip id="9" depart="0.18" departLane="best" departPos="random" departSpeed="max" from="-32270592#0" to="4006702#2"/>
+    <trip id="10" depart="0.20" departLane="best" departPos="random" departSpeed="max" from="-3998615#3" to="-126606716"/>
+    <trip id="11" depart="0.22" departLane="best" departPos="random" departSpeed="max" from="30405358#0" to="8402998#3"/>
+    <trip id="12" depart="0.24" departLane="best" departPos="random" departSpeed="max" from="-4006705#2" to="-32302591#0"/>
+    <trip id="13" depart="0.26" departLane="best" departPos="random" departSpeed="max" from="5445204#2" to="31241816#0"/>
+    <trip id="14" depart="0.28" departLane="best" departPos="random" departSpeed="max" from="-4006687" to="4006703#1"/>
+    <trip id="15" depart="0.30" departLane="best" departPos="random" departSpeed="max" from="28269601" to="-31241848"/>
+    <trip id="16" depart="0.32" departLane="best" departPos="random" departSpeed="max" from="113939244#2" to="4099270#1"/>
+    <trip id="17" depart="0.34" departLane="best" departPos="random" departSpeed="max" from="31241851#2" to="-25398494#0"/>
+    <trip id="18" depart="0.36" departLane="best" departPos="random" departSpeed="max" from="4047532" to="-31241835#0"/>
+    <trip id="19" depart="0.38" departLane="best" departPos="random" departSpeed="max" from="5445204#2" to="-31241834#1"/>
+    <trip id="20" depart="0.40" departLane="best" departPos="random" departSpeed="max" from="30405358#0" to="4047446#1"/>
+    <trip id="21" depart="0.42" departLane="best" departPos="random" departSpeed="max" from="-25398494#0" to="4006702#0"/>
+    <trip id="22" depart="0.44" departLane="best" departPos="random" departSpeed="max" from="-4006693#1" to="31241851#2"/>
+    <trip id="23" depart="0.46" departLane="best" departPos="random" departSpeed="max" from="4006688#4" to="31241816#3"/>
+    <trip id="24" depart="0.48" departLane="best" departPos="random" departSpeed="max" from="29900565#2" to="-31241816#0"/>
+    <trip id="25" depart="0.50" departLane="best" departPos="random" departSpeed="max" from="-31255203#0" to="-29900565#0"/>
+    <trip id="26" depart="0.52" departLane="best" departPos="random" departSpeed="max" from="5445204#3" to="-25210699"/>
+    <trip id="27" depart="0.54" departLane="best" departPos="random" departSpeed="max" from="-31241834#1" to="4006693#3"/>
+    <trip id="28" depart="0.56" departLane="best" departPos="random" departSpeed="max" from="-4099270#0" to="113939241"/>
+    <trip id="29" depart="0.58" departLane="best" departPos="random" departSpeed="max" from="-31401017#2" to="3013106#0"/>
+    <trip id="30" depart="0.60" departLane="best" departPos="random" departSpeed="max" from="-5558" to="-31241835#0"/>
+    <trip id="31" depart="0.62" departLane="best" departPos="random" departSpeed="max" from="4900041#0" to="-29900561#0"/>
+    <trip id="32" depart="0.64" departLane="best" departPos="random" departSpeed="max" from="-28631632" to="-4006674#2"/>
+    <trip id="33" depart="0.66" departLane="best" departPos="random" departSpeed="max" from="-4006724#1" to="113939242#2"/>
+    <trip id="34" depart="0.68" departLane="best" departPos="random" departSpeed="max" from="-5445204#3" to="4006702#1"/>
+    <trip id="35" depart="0.70" departLane="best" departPos="random" departSpeed="max" from="31241838#0" to="4006693#4"/>
+    <trip id="36" depart="0.72" departLane="best" departPos="random" departSpeed="max" from="4900041#1" to="-29900567"/>
+    <trip id="37" depart="0.74" departLane="best" departPos="random" departSpeed="max" from="15259223" to="-3998615#3"/>
+    <trip id="38" depart="0.76" departLane="best" departPos="random" departSpeed="max" from="25398494#0" to="4900043"/>
+    <trip id="39" depart="0.78" departLane="best" departPos="random" departSpeed="max" from="-29900561#0" to="-31241853#2"/>
+    <trip id="40" depart="0.80" departLane="best" departPos="random" departSpeed="max" from="4006668" to="-3998645#0"/>
+    <trip id="41" depart="0.82" departLane="best" departPos="random" departSpeed="max" from="-23341293" to="31241855#1"/>
+    <trip id="42" depart="0.84" departLane="best" departPos="random" departSpeed="max" from="-31241851#1" to="4047241"/>
+    <trip id="43" depart="0.86" departLane="best" departPos="random" departSpeed="max" from="-31401017#2" to="4900041#1"/>
+    <trip id="44" depart="0.88" departLane="best" departPos="random" departSpeed="max" from="32611578" to="-31401017#0"/>
+    <trip id="45" depart="0.90" departLane="best" departPos="random" departSpeed="max" from="-37591481" to="3013106#1"/>
+    <trip id="46" depart="0.92" departLane="best" departPos="random" departSpeed="max" from="-31720633" to="-41973977"/>
+    <trip id="47" depart="0.94" departLane="best" departPos="random" departSpeed="max" from="23805514#1" to="-31401017#0"/>
+    <trip id="48" depart="0.96" departLane="best" departPos="random" departSpeed="max" from="-31241851#1" to="4797872"/>
+    <trip id="49" depart="0.98" departLane="best" departPos="random" departSpeed="max" from="31241816#0" to="-29900565#0"/>
+</routes>

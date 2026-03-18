@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2026-03-16 13:01:30 by Eclipse SUMO duarouter Version 1.11.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/duarouterConfiguration.xsd">
+
+    <input>
+        <net-file value="erlangen.net.xml"/>
+        <route-files value="trips.trips.xml"/>
+    </input>
+
+    <output>
+        <output-file value="erlangen.rou.xml"/>
+        <alternatives-output value="erlangen.rou.alt.xml"/>
+    </output>
+
+    <time>
+        <begin value="0"/>
+        <end value="1"/>
+    </time>
+
+    <report>
+        <no-warnings value="true"/>
+        <ignore-errors value="true"/>
+        <no-step-log value="true"/>
+    </report>
+
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vehicle id="0" depart="0.00" departLane="best" departPos="random" departSpeed="max">
+        <route edges="30405358#0 30405358#1 85355912 85355911#0 85355911#1 30405356 5931612 30350450#0 30350450#1 30350450#2 4006702#0 4006702#1 4900043 4900041#1 4900041#2 4900041#3"/>
+    </vehicle>
+    <vehicle id="2" depart="0.04" departLane="best" departPos="random" departSpeed="max">
+        <route edges="15259223 4006668 23339459 30405358#1 85355912 85355911#0 85355911#1 30405356 25472079 30405352 19796637 122161390 -30357194 3998613#0 3998653"/>
+    </vehicle>
+    <vehicle id="5" depart="0.10" departLane="best" departPos="random" departSpeed="max">
+        <route edges="15259223 4006668 23339459 30405358#1 85355912 85355911#0 85355911#1 30405356 5931612 30350450#0 -3998645#2 -3998645#1 -3998645#0 3998645#0"/>
+    </vehicle>
+    <vehicle id="10" depart="0.20" departLane="best" departPos="random" departSpeed="max">
+        <route edges="30405358#0 30405358#1 85355912 85355911#0 85355911#1 30405356 25472079 30405352 30350445 31353573#0 31353573#1 -3998613#2"/>
+    </vehicle>
+    <vehicle id="11" depart="0.22" departLane="best" departPos="random" departSpeed="max">
+        <route edges="3013109 3013107 3013106#1 3013106#2 4319352#1 44069041#0 44069041#1 4400949 31982182#0 4047241 4797872 4797871 -15259223"/>
+    </vehicle>
+    <vehicle id="15" depart="0.30" departLane="best" departPos="random" departSpeed="max">
+        <route edges="31241851#0 31241851#1 31241851#2 -31255203#0 -4006702#0 4319352#1 44069041#0 44069041#1 4400949 31982182#0 4047241 4797872 4797871 4006668 126606716 113939242#0 113939242#1 113939242#2 113939241 32320329"/>
+    </vehicle>
+    <vehicle id="19" depart="0.38" departLane="best" departPos="random" departSpeed="max">
+        <route edges="-4006726#1 -3998643#0 -3998612#1 -3998612#0 30357194 25472299 30350448 30350449 4400949 31982182#0 31982182#1"/>
+    </vehicle>
+    <vehicle id="21" depart="0.42" departLane="best" departPos="random" departSpeed="max">
+        <route edges="30405358#0 30405358#1 85355912 85355911#0 85355911#1 30405356 5931612 30350450#0 30350450#1 30350450#2 4006702#0 31255203#0 31255203#1 31241838#0 -31241853#1 -31241853#0 31241853#0 -31241855#1"/>
+    </vehicle>
+    <vehicle id="23" depart="0.46" departLane="best" departPos="random" departSpeed="max">
+        <route edges="30357194 25472299 30350448 30350449 4400949 31982182#0 4047241 4797872 4797871 -15259223"/>
+    </vehicle>
+    <vehicle id="28" depart="0.56" departLane="best" departPos="random" departSpeed="max">
+        <route edges="31241835#1 31241834#0 31241848 31241851#0 31241851#1 31241851#2 -31255203#0 -4006702#0 4319352#1 44069041#0 44069041#1 4400949 31982182#0 31982182#1"/>
+    </vehicle>
+    <vehicle id="29" depart="0.58" departLane="best" departPos="random" departSpeed="max">
+        <route edges="-3998612#1 -3998612#0 30357194 25472299 30350448 30350449 4400949 31982182#0 31982182#1"/>
+    </vehicle>
+    <vehicle id="30" depart="0.60" departLane="best" departPos="random" departSpeed="max">
+        <route edges="30405358#0 30405358#1 85355912 85355911#0 85355911#1 30405356 25472079 30405352 30350445 -33174302#1 -33174302#0 -32302591#5 -32302591#4 -32302591#3 -32302591#2 -32302591#1 -32302591#0 -125685391"/>
+    </vehicle>
+    <vehicle id="33" depart="0.66" departLane="best" departPos="random" departSpeed="max">
+        <route edges="-32320329 -113939241 113939244#0 113939244#1 113939244#2 -126606716 23339459 30405358#1 85355912 85355911#0 85355911#1 30405356 5931612 30350450#0 30350450#1 30350450#2 4006702#0 4006702#1 4006702#2 -28269598 -4006703#1 4006705#1 4006705#2 31720632#0 31720632#1"/>
+    </vehicle>
+    <vehicle id="35" depart="0.70" departLane="best" departPos="random" departSpeed="max">
+        <route edges="23350930 4900041#3 4900041#0 -4900043 -4006702#1 -4006702#0 4319352#1 44069041#0 44069041#1 4400949 31982182#0 4047241 4797872 4797871 4006668 126606716 113939242#0 113939242#1 113939242#2 113939241"/>
+    </vehicle>
+    <vehicle id="37" depart="0.74" departLane="best" departPos="random" departSpeed="max">
+        <route edges="28269598 -4006702#2 -4006702#1 -4006702#0 4319352#1 44069041#0 44069041#1 4400949 31982182#0 4047241 4797872 4797871 -15259223"/>
+    </vehicle>
+    <vehicle id="41" depart="0.82" departLane="best" departPos="random" departSpeed="max">
+        <route edges="-32320329 -113939241 113939244#0 113939244#1 113939244#2 -126606716 23339459 30405358#1 85355912 85355911#0 85355911#1 30405356 5931612 30350450#0 30350450#1 30350450#2 4006702#0 31255203#0 31255203#1 31241838#0 31241853#2"/>
+    </vehicle>
+    <vehicle id="42" depart="0.84" departLane="best" departPos="random" departSpeed="max">
+        <route edges="-113939241 113939244#0 113939244#1 113939244#2 -126606716 23339459 30405358#1 85355912 85355911#0 85355911#1 30405356 5931612 30350450#0 30350450#1 30350450#2 4006702#0 4006702#1 4900043 4900041#1 4900041#2 -23350930"/>
+    </vehicle>
+    <vehicle id="45" depart="0.90" departLane="best" departPos="random" departSpeed="max">
+        <route edges="3998613#1 3998613#2 -31353573#1 -31353573#0 4686970#0 4686970#1 122161381 30350448 30350449 4400949 31982182#0 4047241 4797872 4797871 -15259223"/>
+    </vehicle>
+    <vehicle id="46" depart="0.92" departLane="best" departPos="random" departSpeed="max">
+        <route edges="-3998645#0 -3998612#0 30357194 25472299 30350448 30350449 4400949 31982182#0 31982182#1"/>
+    </vehicle>
+</routes>

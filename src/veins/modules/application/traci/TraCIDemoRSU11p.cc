@@ -38,8 +38,12 @@ void TraCIDemoRSU11p::onWSA(DemoServiceAdvertisment* wsa)
 
 void TraCIDemoRSU11p::onWSM(BaseFrame1609_4* frame)
 {
+    static int rsuCnt = 0;
+
+        // 메시지 타입 변환
     TraCIDemo11pMessage* wsm = check_and_cast<TraCIDemo11pMessage*>(frame);
 
-    // this rsu repeats the received traffic update in 2 seconds plus some random delay
+        // 지연 전송, 예약 전송 : 받은 메시지를 2초 뒤, 랜덤 지연 포함해 재전송한다. (dup 복사)
+        // 하위 계층으로 메시지를 내려보낸다.
     sendDelayedDown(wsm->dup(), 2 + uniform(0.01, 0.2));
 }

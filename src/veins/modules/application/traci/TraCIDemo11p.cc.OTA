@@ -1,0 +1,54 @@
+#include "veins/modules/application/traci/TraCIDemo11p.h"
+#include "veins/modules/application/traci/TraCIDemo11pMessage_m.h"
+
+using namespace veins;
+
+Define_Module(veins::TraCIDemo11p);
+
+void TraCIDemo11p::initialize(int stage)
+{
+    DemoBaseApplLayer::initialize(stage);
+    if (stage == 0) {
+        // -1은 아직 아무것도 요청하지 않은 상태를 의미
+        currentSubscribedServiceId = -1;
+    }
+}
+
+// 1. RSU의 신호를 받으면 요청 보내기
+void TraCIDemo11p::onWSA(DemoServiceAdvertisment* wsa)
+{
+    // 이미 요청을 보냈다면(구독 중이면) 무시
+    if (currentSubscribedServiceId != -1) return;
+
+    // RSU 채널로 이동 및 서비스 등록
+    mac->changeServiceChannel(static_cast<Channel>(wsa->getTargetChannel()));
+    currentSubscribedServiceId = wsa->getPsid();
+
+    // RSU에게 OTA 파일 요청
+    TraCIDemo11pMessage* request = new TraCIDemo11pMessage();
+    populateWSM(request);
+    request->setDemoData("OTA_REQUEST");
+
+    sendDown(request);
+}
+
+// 2. RSU가 보낸 데이터를 받으면 처리하기
+void TraCIDemo11p::onWSM(BaseFrame1609_4* frame)
+{
+    TraCIDemo11pMessage* wsm = check_and_cast<TraCIDemo11pMessage*>(frame);
+
+    // 받은 데이터 이름에 "OTA_DATA"가 들어있으면 성공!
+    if (std::string(wsm->getDemoData()).find("OTA_DATA") != std::string::npos) {
+        // 차를 초록색으로 바꿔서 눈으로 확인
+        findHost()->getDisplayString().setTagArg("i", 1, "green");
+    }
+}
+
+// 아래 함수들은 에러 방지를 위해 껍데기만 남겨둡니다.
+void TraCIDemo11p::handleSelfMsg(cMessage* msg) {
+    DemoBaseApplLayer::handleSelfMsg(msg);
+}
+
+void TraCIDemo11p::handlePositionUpdate(cObject* obj) {
+    DemoBaseApplLayer::handlePositionUpdate(obj);
+}
