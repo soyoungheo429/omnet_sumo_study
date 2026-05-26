@@ -58,8 +58,7 @@ def calculate_distance(lat1, lon1, lat2, lon2):
 
 sorted_candidates = sorted(rsu_results, key=lambda x: (x[3], x[4]), reverse=True)
 
-MIN_DISTANCE = 200 
-filtered_rsus = []
+MIN_DISTANCE = 150
 
 for candidate in sorted_candidates:
     cand_id, cand_lat, cand_lon, cand_deg, cand_dens = candidate
