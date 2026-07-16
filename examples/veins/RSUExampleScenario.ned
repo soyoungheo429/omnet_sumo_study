@@ -26,8 +26,10 @@ import org.car2x.veins.nodes.TrafficLight;
 
 network RSUExampleScenario extends Scenario
 {
+    parameters:
+        int numRSUs = default(1);  // <-- (추가) 외부에서 개수를 입력받을 수 있는 변수 선언
     submodules:
-        rsu[1]: RSU {
+        rsu[numRSUs]: RSU { // <-- (수정) rsu[1]을 rsu[numRSUs]로 변경
             @display("p=150,140;i=veins/sign/yellowdiamond;is=vs");
         }
 

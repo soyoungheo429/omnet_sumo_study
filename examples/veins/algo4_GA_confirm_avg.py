@@ -216,6 +216,22 @@ for run_idx in range(1, NUM_RUNS + 1):
         population = next_population
         
     print(f"\nRun {run_idx} 완료! 최종 최고 PDR: {run_best_pdr:.2f}%")
+    
+    # [수정된 부분] Run idx 루프 마지막에 추가할 내용
+    population.sort(key=lambda item: item['pdr'], reverse=True)
+    top1 = population[0]
+    top2 = population[1]
+    
+    run_result = {
+        "Run": run_idx,
+        "Top1_PDR": top1['pdr'], "Top1_X": top1['x'], "Top1_Y": top1['y'],
+        "Top2_PDR": top2['pdr'], "Top2_X": top2['x'], "Top2_Y": top2['y']
+    }
+    all_runs_history.append(run_result)
+    
+    print(f"\n[RUN {run_idx} 결과 요약]")
+    print(f"  ★ 1등: PDR {top1['pdr']:.2f}% | 좌표 ({top1['x']:.2f}, {top1['y']:.2f})")
+    print(f"  ★ 2등: PDR {top2['pdr']:.2f}% | 좌표 ({top2['x']:.2f}, {top2['y']:.2f})")
 
 # =========================================================
 # 6. 결과 저장 및 논문용 에러바(음영) 시각화
