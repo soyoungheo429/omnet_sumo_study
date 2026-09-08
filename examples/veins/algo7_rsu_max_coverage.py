@@ -206,6 +206,10 @@ def main():
     elif args.net:
         candidates = load_candidates_from_intersections(args.net)
         candidate_ids = np.array([f"Intersection_{i}" for i in range(len(candidates))])
+        # [algo7] 차량 좌표는 위에서 이미 OFFSET을 빼 로컬 좌표계로 변환했는데,
+        # net.xml에서 뽑은 후보지는 변환이 안 돼 있어 서로 다른 스케일이 되던 버그 수정
+        candidates[:, 0] = candidates[:, 0] - OFFSET_X
+        candidates[:, 1] = candidates[:, 1] - OFFSET_Y
     elif args.candidates_csv:
         df_cand = pd.read_csv(args.candidates_csv)
         if 'ID' in df_cand.columns and 'Sim_X' in df_cand.columns and 'Sim_Y' in df_cand.columns:
@@ -256,3 +260,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
