@@ -5,3 +5,6 @@ examples/veins/results/
 *.sca
 *.vec
 *.vci
+__pycache__/
+*.so
+run_log*.txt
