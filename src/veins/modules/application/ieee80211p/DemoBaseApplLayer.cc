@@ -101,10 +101,14 @@ void DemoBaseApplLayer::initialize(int stage)
                 }
                 firstBeacon = computeAsynchronousSendingTime(beaconInterval, ChannelType::control);
             }
-
-            if (sendBeacons) {
-                scheduleAt(firstBeacon, sendBeaconEvt);
-            }
+        }
+        // [algo7] 버그 수정: 원래 scheduleAt()이 avoidBeaconSynchronization==true
+        // 블록 안에만 있어서, false로 설정하면 비콘이 아예 발신되지 않았음(총 발신 0).
+        // false일 때도 (오프셋 없이) 비콘이 나가도록 블록 밖으로 뺌.
+        // 추가로 indexOffset(결정론적 인덱스 기반 오프셋)을 무조건 더해줌.
+        firstBeacon += par("indexOffset").doubleValueInUnit("s");
+        if (sendBeacons) {
+            scheduleAt(firstBeacon, sendBeaconEvt);
         }
     }
 }

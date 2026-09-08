@@ -49,6 +49,7 @@ simple DemoBaseApplLayer like IBaseApplLayer
         int dataUserPriority = default(7); //the default user priority (UP) for data packets
 
         bool avoidBeaconSynchronization = default(true); //don't start beaconing directly after node was created but delay to avoid artifical synchronization
+        double indexOffset @unit(s) = default(0s); // [algo7] index 기반 결정론적 비콘 시작 오프셋 (예: *.rsu[*].appl.indexOffset = (index * 0.01)s), 0이면 영향 없음
 
         bool sendWSA = default(false);
         int wsaLengthBits = default(250bit) @unit(bit);
