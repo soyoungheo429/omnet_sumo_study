@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
 [V4] SUMO XML 데이터에서 10초 ~ 200초 구간 동안
-정확히 2초(2.0s) 간격으로 스냅샷을 추출하는 스크립트
+정확히 0.05초(s) 간격으로 스냅샷을 추출하는 스크립트
 """
 import xml.etree.ElementTree as ET
 import pandas as pd
 
-def parse_snapshots_2sec(xml_file, csv_output_file, start_time=10.0, end_time=200.0, interval=2.0):
+def parse_snapshots_005sec(xml_file, csv_output_file, start_time=10.0, end_time=200.0, interval=0.05):
     print(f"[{xml_file}] 파싱을 시작합니다... (목표: {start_time}초부터 {interval}초 간격)")
     tree = ET.parse(xml_file)
     root = tree.getroot()
@@ -58,5 +58,5 @@ if __name__ == "__main__":
     INPUT_XML = "vehicle_snapshots.xml"  # SUMO에서 뽑아낸 원본 XML 파일명
     OUTPUT_CSV = "vehicle_snapshots.csv" # 저장할 CSV 파일명
     
-    # 10초부터 200초까지 2초 간격으로 추출 실행
-    parse_snapshots_2sec(INPUT_XML, OUTPUT_CSV, start_time=10.0, end_time=200.0, interval=2.0)
+    # 10초부터 200초까지 0.05초 간격으로 추출 실행
+    parse_snapshots_005sec(INPUT_XML, OUTPUT_CSV, start_time=10.0, end_time=200.0, interval=0.05)
