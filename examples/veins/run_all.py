@@ -22,7 +22,9 @@ from rsu_lib import naming, run_logger, sim_runner, config_version  # noqa: E402
 
 BASE_INI_TEMPLATE = "omnetpp_template.ini"
 WORKING_INI = "omnetpp.ini"
-RESULTS_BASE_DIR = "results_organized"
+# 주의: "results/"는 OMNeT++가 시뮬레이션마다 통째로 지우고 새로 만드는
+# 작업 폴더(results/General-#0.sca)라서 절대 이 이름을 재사용하면 안 됨.
+RESULTS_BASE_DIR = "experiment_results"
 
 # ---------------------------------------------------------------
 # 여기에 돌리고 싶은 조합을 전부 적는다. 이 리스트가 "실험 계획서" 역할.
