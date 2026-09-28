@@ -18,7 +18,7 @@ import random
 import pandas as pd
 
 sys.path.insert(0, os.path.dirname(__file__))
-from rsu_lib import naming, run_logger, sim_runner  # noqa: E402
+from rsu_lib import naming, run_logger, sim_runner, config_version  # noqa: E402
 
 BASE_INI_TEMPLATE = "omnetpp_template.ini"
 WORKING_INI = "omnetpp.ini"
@@ -83,6 +83,8 @@ def set_ini_bitrate_sync(bitrate: str, sync: bool) -> None:
 def run_one_combo(combo: dict) -> None:
     df = pd.read_csv(combo["candidates_csv"])
     set_ini_bitrate_sync(combo["bitrate"], combo["sync"])
+    # [config_version] 좌표는 안 남기고, bitrate/sync 조합("체제")만 영구 스냅샷
+    config_version.snapshot_current_regime(BASE_INI_TEMPLATE)
 
     for k in combo["k_values"]:
         params = {
@@ -92,7 +94,9 @@ def run_one_combo(combo: dict) -> None:
             "candidates": os.path.basename(combo["candidates_csv"]),
         }
         name = naming.build_name(combo["algo"], combo["mode"], params)
-        paths = naming.result_paths(RESULTS_BASE_DIR, name)
+        paths = naming.result_paths(
+            RESULTS_BASE_DIR, combo["algo"], combo["mode"], name
+        )
 
         with run_logger.RunLogger(
             paths["log_txt"].replace(".txt", ".json"),

@@ -37,11 +37,13 @@ def build_name(
     return "_".join(str(p) for p in parts)
 
 
-def result_paths(base_dir: str, name: str) -> dict:
+def result_paths(base_dir: str, algo: str, mode: str, name: str) -> dict:
     """이름 하나로부터 이 실행에서 쓸 모든 산출물 경로를 일관되게 생성.
+    폴더 구조: {base_dir}/{single|multi}/{algo}/{name}/...
+    (교수님 피드백: single/multi > algo1.. 로 먼저 나누기)
     raw/trend/plot/log가 항상 같은 접두어(name)를 공유하므로, 파일 목록만
     봐도 어느 실행에서 나온 건지 바로 알 수 있다."""
-    run_dir = os.path.join(base_dir, name)
+    run_dir = os.path.join(base_dir, mode, algo, name)
     os.makedirs(run_dir, exist_ok=True)
     return {
         "dir": run_dir,
@@ -49,7 +51,6 @@ def result_paths(base_dir: str, name: str) -> dict:
         "trend_csv": os.path.join(run_dir, f"{name}_trend.csv"),
         "plot_png": os.path.join(run_dir, f"{name}_plot.png"),
         "log_txt": os.path.join(run_dir, f"{name}_log.txt"),
-        "config_snapshot_ini": os.path.join(run_dir, f"{name}_config.ini"),
     }
 
 
@@ -61,4 +62,4 @@ if __name__ == "__main__":
         run_id="run01",
     )
     print(name)
-    print(result_paths("results", name))
+    print(result_paths("results", "algo7", "multi", name))
