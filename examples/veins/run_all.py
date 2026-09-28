@@ -253,8 +253,44 @@ def run_one_combo(combo: dict) -> None:
 
 
 def main():
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="CONFIG_MATRIX에 정의된 실험들을 순회 실행. "
+        "기본은 전체 실행이며, --only로 특정 알고리즘만 골라 실행할 수 있다."
+    )
+    parser.add_argument(
+        "--only",
+        type=str,
+        default=None,
+        help="쉼표로 구분된 algo 이름 목록만 실행 (예: --only algo3_SA_standard,algo4_GA_hybrid). "
+        "CONFIG_MATRIX의 'algo' 필드와 정확히 일치해야 함.",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="실제로 실행하지 않고, 어떤 조합이 어떤 순서로 실행될지만 출력.",
+    )
+    args = parser.parse_args()
+
+    combos = CONFIG_MATRIX
+    if args.only:
+        wanted = {name.strip() for name in args.only.split(",")}
+        combos = [c for c in CONFIG_MATRIX if c["algo"] in wanted]
+        missing = wanted - {c["algo"] for c in combos}
+        if missing:
+            print(f"!! 경고: CONFIG_MATRIX에 없는 algo 이름: {missing}")
+
+    if args.dry_run:
+        print(f"[dry-run] 총 {len(combos)}개 조합이 이 순서로 실행됩니다:")
+        for i, c in enumerate(combos, 1):
+            print(
+                f"  {i}. algo={c['algo']} mode={c['mode']} type={c.get('type', 'candidate_list')}"
+            )
+        return
+
     os.makedirs(RESULTS_BASE_DIR, exist_ok=True)
-    for combo in CONFIG_MATRIX:
+    for combo in combos:
         run_one_combo(combo)
 
 
