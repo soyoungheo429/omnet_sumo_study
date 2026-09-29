@@ -1,0 +1,6 @@
+﻿K,PDR_Mean,PDR_Std,PDR_Min,PDR_Max,N,Elapsed_Sec_Mean,Bitrate,AvoidBeaconSync
+1,20.62,0.01,20.62,20.63,2,46.24,6Mbps,true
+2,19.23,0.0,19.23,19.23,2,46.87,6Mbps,true
+3,17.98,0.0,17.98,17.98,2,47.78,6Mbps,true
+4,14.88,0.04,14.86,14.91,2,55.68,6Mbps,true
+5,17.62,0.04,17.6,17.65,2,59.26,6Mbps,true
