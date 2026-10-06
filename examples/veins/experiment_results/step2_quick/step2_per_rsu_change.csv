@@ -1,0 +1,13 @@
+﻿Phase,Algo,Sync,Bitrate,K,Rank,Iso_Rx,Multi_Rx_mean,Rel_Change_pct
+control,algo7,False,6Mbps,1,1,19385.0,19385.0,0.0
+control,algo7,False,6Mbps,3,1,19385.0,19087.0,-1.54
+control,algo7,False,6Mbps,3,2,18898.0,14056.0,-25.62
+control,algo7,False,6Mbps,3,3,13109.0,13974.0,6.6
+sweep,algo1,True,6Mbps,1,1,29629.0,29629.0,0.0
+sweep,algo1,True,6Mbps,3,1,29629.0,29407.0,-0.75
+sweep,algo1,True,6Mbps,3,2,13107.0,13757.0,4.96
+sweep,algo1,True,6Mbps,3,3,1604.0,1816.0,13.22
+sweep,algo7,True,6Mbps,1,1,19382.0,19382.0,0.0
+sweep,algo7,True,6Mbps,3,1,19382.0,19388.0,0.03
+sweep,algo7,True,6Mbps,3,2,18898.0,16772.0,-11.25
+sweep,algo7,True,6Mbps,3,3,13109.0,14564.0,11.1

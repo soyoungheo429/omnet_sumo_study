@@ -1,0 +1,4 @@
+﻿K,Repeat,Seed,Total_Generated,Num_Vehicles,Expected_Received,Actual_Received,PDR(%),Elapsed_Sec
+1,1,731458,2000,47,94000,15860,16.87,3.1
+1,2,914088,2000,47,94000,15860,16.87,2.74
+1,3,436059,2000,47,94000,15860,16.87,2.68

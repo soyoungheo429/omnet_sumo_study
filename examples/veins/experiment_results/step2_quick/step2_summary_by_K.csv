@@ -1,0 +1,7 @@
+﻿Phase,Algo,Sync,Bitrate,K,N,PDR_mean,PDR_std,Total_Received_mean,Total_Received_std,Service_Ratio_mean,Service_Ratio_std,Jain_RSU_mean,Jain_RSU_std,Jain_Vehicle_mean,Jain_Vehicle_std,PER_mean,PER_std,Collisions_mean,Collisions_std,RXTX_Lost_mean,RXTX_Lost_std,RSSI_Mean_dBm_mean,RSSI_Mean_dBm_std,SNR_Mean_dB_mean,SNR_Mean_dB_std,Channel_Busy_mean,Channel_Busy_std,Elapsed_Sec_mean,Elapsed_Sec_std,Iso_Rx_Sum,Eta,Max_RSU_Loss_pct,Max_RSU_Gain_pct
+control,algo7,False,6Mbps,1,1,20.61,,19385.0,,21.4715,,1.0,,0.6757,,0.0,,0.0,,0.0,,-76.327,,21.665,,0.0233,,11.66,,19385.0,0.0,0.0,0.0
+control,algo7,False,6Mbps,3,1,16.7,,47117.0,,52.1875,,0.9773,,0.8925,,6.7143,,570.0,,1.0,,-75.08,,22.168,,0.0599,,14.29,,51392.0,0.08318415317559158,25.62,6.6
+sweep,algo1,True,6Mbps,1,1,31.52,,29629.0,,32.8246,,1.0,,0.7827,,0.0,,0.0,,0.0,,-77.745,,20.248,,0.0351,,12.72,,29629.0,0.0,0.0,0.0
+sweep,algo1,True,6Mbps,3,1,15.95,,44980.0,,46.5479,,0.6378,,0.796,,0.0,,0.0,,0.0,,-76.324,,21.669,,0.053,,15.5,,44340.0,-0.014433919711321685,0.75,13.22
+sweep,algo7,True,6Mbps,1,1,20.62,,19382.0,,21.4679,,1.0,,0.6756,,0.0,,0.0,,0.0,,-76.325,,21.668,,0.0233,,14.15,,19382.0,0.0,0.0,0.0
+sweep,algo7,True,6Mbps,3,1,17.99,,50724.0,,53.0382,,0.9866,,0.8879,,0.0,,0.0,,0.0,,-75.477,,22.515,,0.0601,,13.94,,51389.0,0.012940512561053885,11.25,11.1

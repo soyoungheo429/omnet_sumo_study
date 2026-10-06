@@ -1,0 +1,4 @@
+﻿Metric,Pearson_r,Pearson_p,Spearman_r,Spearman_p
+Total_TimesIntoBackoff,-0.3521,0.0122,-0.1957,0.1731
+Total_SlotsBackoff,-0.3509,0.0125,-0.2019,0.1597
+Total_NCollisions,0.0199,0.8911,-0.0452,0.7555

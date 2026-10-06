@@ -1,0 +1,10 @@
+﻿Algo,Sync,Bitrate,Rank_Iso,N,Iso_Rx,Iso_PDR,Iso_Service,Iso_RSSI
+algo1,True,6Mbps,1,1,29629.0,31.52,32.8246,-77.745
+algo1,True,6Mbps,2,1,13107.0,13.94,14.2034,-74.359
+algo1,True,6Mbps,3,1,1604.0,1.71,1.7382,-70.27
+algo7,False,6Mbps,1,1,19385.0,20.61,21.4715,-76.327
+algo7,False,6Mbps,2,1,18898.0,20.09,20.4789,-75.424
+algo7,False,6Mbps,3,1,13109.0,13.94,14.2056,-74.356
+algo7,True,6Mbps,1,1,19382.0,20.62,21.4679,-76.325
+algo7,True,6Mbps,2,1,18898.0,20.1,20.4789,-75.424
+algo7,True,6Mbps,3,1,13109.0,13.95,14.2056,-74.356

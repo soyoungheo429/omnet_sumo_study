@@ -1,0 +1,4 @@
+Mode,K,Rep,Seed,Coords,Success,Elapsed_Sec,PDR,Service_Ratio,Total_Received,Jain_RSU,Jain_Vehicle,PER,Collisions,RSSI_Mean_dBm,SNR_Mean_dB,Metrics_OK,Error
+single,1,0,7010,"[[1292.47, 1361.22]]",True,24.92,32.49,33.8398,30545,1.0,0.774,0.0,0,-77.888,20.105,True,
+top,2,0,7020,"[[1292.47, 1361.22], [1312.12, 1370.77]]",True,42.75,28.34,30.4981,53281,0.9998,0.6803,0.003,1,-78.603,19.39,True,
+diverse,2,0,7020,"[[1292.47, 1361.22], [1558.75, 1613.94]]",True,22.62,21.21,35.8648,39883,0.7796,0.7633,0.0,0,-79.513,18.48,True,

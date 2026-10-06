@@ -1,0 +1,219 @@
+nohup: ignoring input
+총 121 run 중 남은 것 121 (isolated 37, sweep 75, control 9) · 예상 37분 · 결과 폴더 experiment_results/step2/
+
+[알고리즘 선정 시간 측정]
+[step  1] 후보지 idx=172 신규 커버=657   누적 커버율=14.7%
+[step  2] 후보지 idx=73  신규 커버=452   누적 커버율=24.8%
+[step  3] 후보지 idx=69  신규 커버=443   누적 커버율=34.8%
+[step  4] 후보지 idx=61  신규 커버=293   누적 커버율=41.3%
+[step  5] 후보지 idx=155 신규 커버=242   누적 커버율=46.7%
+[step  6] 후보지 idx=123 신규 커버=195   누적 커버율=51.1%
+[step  7] 후보지 idx=132 신규 커버=168   누적 커버율=54.9%
+[step  8] 후보지 idx=47  신규 커버=149   누적 커버율=58.2%
+[step  9] 후보지 idx=14  신규 커버=144   누적 커버율=61.4%
+[step 10] 후보지 idx=134 신규 커버=141   누적 커버율=64.6%
+[step 11] 후보지 idx=79  신규 커버=120   누적 커버율=67.3%
+[step 12] 후보지 idx=139 신규 커버=92    누적 커버율=69.3%
+[step 13] 후보지 idx=140 신규 커버=91    누적 커버율=71.4%
+[step 14] 후보지 idx=130 신규 커버=86    누적 커버율=73.3%
+[step 15] 후보지 idx=33  신규 커버=84    누적 커버율=75.2%
+[step 16] 후보지 idx=6   신규 커버=82    누적 커버율=77.0%
+[step 17] 후보지 idx=71  신규 커버=71    누적 커버율=78.6%
+[step 18] 후보지 idx=133 신규 커버=63    누적 커버율=80.0%
+[step 19] 후보지 idx=186 신규 커버=55    누적 커버율=81.3%
+[step 20] 후보지 idx=187 신규 커버=55    누적 커버율=82.5%
+[step 21] 후보지 idx=22  신규 커버=54    누적 커버율=83.7%
+[step 22] 후보지 idx=12  신규 커버=52    누적 커버율=84.9%
+[step 23] 후보지 idx=45  신규 커버=50    누적 커버율=86.0%
+[step 24] 후보지 idx=74  신규 커버=50    누적 커버율=87.1%
+[step 25] 후보지 idx=113 신규 커버=47    누적 커버율=88.2%
+[step 26] 후보지 idx=80  신규 커버=41    누적 커버율=89.1%
+[step 27] 후보지 idx=126 신규 커버=39    누적 커버율=89.9%
+[step  1] 후보지 idx=172 신규 커버=657   누적 커버율=14.7%
+[step  2] 후보지 idx=73  신규 커버=452   누적 커버율=24.8%
+[step  3] 후보지 idx=69  신규 커버=443   누적 커버율=34.8%
+[step  4] 후보지 idx=61  신규 커버=293   누적 커버율=41.3%
+[step  5] 후보지 idx=155 신규 커버=242   누적 커버율=46.7%
+[step  6] 후보지 idx=123 신규 커버=195   누적 커버율=51.1%
+[step  7] 후보지 idx=132 신규 커버=168   누적 커버율=54.9%
+[step  8] 후보지 idx=47  신규 커버=149   누적 커버율=58.2%
+[step  9] 후보지 idx=14  신규 커버=144   누적 커버율=61.4%
+[step 10] 후보지 idx=134 신규 커버=141   누적 커버율=64.6%
+[step 11] 후보지 idx=79  신규 커버=120   누적 커버율=67.3%
+[step 12] 후보지 idx=139 신규 커버=92    누적 커버율=69.3%
+[step 13] 후보지 idx=140 신규 커버=91    누적 커버율=71.4%
+[step 14] 후보지 idx=130 신규 커버=86    누적 커버율=73.3%
+[step 15] 후보지 idx=33  신규 커버=84    누적 커버율=75.2%
+[step 16] 후보지 idx=6   신규 커버=82    누적 커버율=77.0%
+[step 17] 후보지 idx=71  신규 커버=71    누적 커버율=78.6%
+[step 18] 후보지 idx=133 신규 커버=63    누적 커버율=80.0%
+[step 19] 후보지 idx=186 신규 커버=55    누적 커버율=81.3%
+[step 20] 후보지 idx=187 신규 커버=55    누적 커버율=82.5%
+[step 21] 후보지 idx=22  신규 커버=54    누적 커버율=83.7%
+[step 22] 후보지 idx=12  신규 커버=52    누적 커버율=84.9%
+[step 23] 후보지 idx=45  신규 커버=50    누적 커버율=86.0%
+[step 24] 후보지 idx=74  신규 커버=50    누적 커버율=87.1%
+[step 25] 후보지 idx=113 신규 커버=47    누적 커버율=88.2%
+[step 26] 후보지 idx=80  신규 커버=41    누적 커버율=89.1%
+[step 27] 후보지 idx=126 신규 커버=39    누적 커버율=89.9%
+[step  1] 후보지 idx=172 신규 커버=657   누적 커버율=14.7%
+[step  2] 후보지 idx=73  신규 커버=452   누적 커버율=24.8%
+[step  3] 후보지 idx=69  신규 커버=443   누적 커버율=34.8%
+[step  4] 후보지 idx=61  신규 커버=293   누적 커버율=41.3%
+[step  5] 후보지 idx=155 신규 커버=242   누적 커버율=46.7%
+[step  6] 후보지 idx=123 신규 커버=195   누적 커버율=51.1%
+[step  7] 후보지 idx=132 신규 커버=168   누적 커버율=54.9%
+[step  8] 후보지 idx=47  신규 커버=149   누적 커버율=58.2%
+[step  9] 후보지 idx=14  신규 커버=144   누적 커버율=61.4%
+[step 10] 후보지 idx=134 신규 커버=141   누적 커버율=64.6%
+[step 11] 후보지 idx=79  신규 커버=120   누적 커버율=67.3%
+[step 12] 후보지 idx=139 신규 커버=92    누적 커버율=69.3%
+[step 13] 후보지 idx=140 신규 커버=91    누적 커버율=71.4%
+[step 14] 후보지 idx=130 신규 커버=86    누적 커버율=73.3%
+[step 15] 후보지 idx=33  신규 커버=84    누적 커버율=75.2%
+[step 16] 후보지 idx=6   신규 커버=82    누적 커버율=77.0%
+[step 17] 후보지 idx=71  신규 커버=71    누적 커버율=78.6%
+[step 18] 후보지 idx=133 신규 커버=63    누적 커버율=80.0%
+[step 19] 후보지 idx=186 신규 커버=55    누적 커버율=81.3%
+[step 20] 후보지 idx=187 신규 커버=55    누적 커버율=82.5%
+[step 21] 후보지 idx=22  신규 커버=54    누적 커버율=83.7%
+[step 22] 후보지 idx=12  신규 커버=52    누적 커버율=84.9%
+[step 23] 후보지 idx=45  신규 커버=50    누적 커버율=86.0%
+[step 24] 후보지 idx=74  신규 커버=50    누적 커버율=87.1%
+[step 25] 후보지 idx=113 신규 커버=47    누적 커버율=88.2%
+[step 26] 후보지 idx=80  신규 커버=41    누적 커버율=89.1%
+[step 27] 후보지 idx=126 신규 커버=39    누적 커버율=89.9%
+ Algo  Selection_Sec  Selection_Sims                                                               Note
+algo1         0.0357               0                     교차로 차수/밀집도 규칙. net.xml 파싱 포함, 3회 중앙값, 시뮬레이션 0회
+algo7         0.2338               0 Greedy max coverage(r=150m, K=27). 스냅샷/교차로 로딩 포함, 3회 중앙값, 시뮬레이션 0회
+[1/121] isolated/algo7/sync=True K=1 rank=1 rep=1: PDR=20.62% Rx=19382 Svc=21.4679% PER=0.0 Coll=0 (16.31s, 남은 약 41분)
+[2/121] isolated/algo7/sync=True K=1 rank=2 rep=1: PDR=20.1% Rx=18898 Svc=20.4789% PER=0.0 Coll=0 (19.7s, 남은 약 41분)
+[3/121] isolated/algo7/sync=True K=1 rank=3 rep=1: PDR=13.95% Rx=13109 Svc=14.2056% PER=0.0 Coll=0 (23.02s, 남은 약 42분)
+[4/121] isolated/algo7/sync=True K=1 rank=4 rep=1: PDR=5.71% Rx=5365 Svc=5.8138% PER=0.0 Coll=0 (22.4s, 남은 약 42분)
+[5/121] isolated/algo7/sync=True K=1 rank=5 rep=1: PDR=27.54% Rx=25887 Svc=28.1139% PER=0.0 Coll=0 (24.21s, 남은 약 42분)
+[6/121] isolated/algo1/sync=True K=1 rank=1 rep=1: PDR=31.52% Rx=29629 Svc=32.8246% PER=0.0 Coll=0 (21.77s, 남은 약 42분)
+[7/121] isolated/algo1/sync=True K=1 rank=2 rep=1: PDR=13.94% Rx=13107 Svc=14.2034% PER=0.0 Coll=0 (24.44s, 남은 약 42분)
+[8/121] isolated/algo1/sync=True K=1 rank=3 rep=1: PDR=1.71% Rx=1604 Svc=1.7382% PER=0.0 Coll=0 (24.23s, 남은 약 41분)
+[9/121] isolated/algo1/sync=True K=1 rank=4 rep=1: PDR=13.55% Rx=12736 Svc=13.8014% PER=0.0 Coll=0 (23.73s, 남은 약 41분)
+[10/121] isolated/algo1/sync=True K=1 rank=5 rep=1: PDR=5.45% Rx=5124 Svc=5.5526% PER=0.0 Coll=0 (27.37s, 남은 약 41분)
+[11/121] isolated/algo1/sync=True K=1 rank=6 rep=1: PDR=23.01% Rx=21627 Svc=23.9725% PER=0.0 Coll=0 (25.3s, 남은 약 41분)
+[12/121] isolated/algo1/sync=True K=1 rank=7 rep=1: PDR=5.4% Rx=5079 Svc=5.5039% PER=0.0 Coll=0 (26.38s, 남은 약 40분)
+[13/121] isolated/algo1/sync=True K=1 rank=8 rep=1: PDR=2.14% Rx=2007 Svc=2.1749% PER=0.0 Coll=0 (25.31s, 남은 약 40분)
+[14/121] isolated/algo1/sync=True K=1 rank=9 rep=1: PDR=4.05% Rx=3805 Svc=4.1233% PER=0.0 Coll=0 (26.02s, 남은 약 40분)
+[15/121] isolated/algo1/sync=True K=1 rank=10 rep=1: PDR=0.99% Rx=935 Svc=1.0132% PER=0.0 Coll=0 (23.06s, 남은 약 39분)
+[16/121] isolated/algo1/sync=True K=1 rank=11 rep=1: PDR=0.02% Rx=19 Svc=0.0206% PER=0.0 Coll=0 (18.24s, 남은 약 39분)
+[17/121] isolated/algo1/sync=True K=1 rank=12 rep=1: PDR=3.52% Rx=3310 Svc=3.5869% PER=0.0 Coll=0 (22.44s, 남은 약 39분)
+[18/121] isolated/algo1/sync=True K=1 rank=13 rep=1: PDR=0.81% Rx=759 Svc=0.8225% PER=0.0 Coll=0 (24.1s, 남은 약 38분)
+[19/121] isolated/algo1/sync=True K=1 rank=14 rep=1: PDR=10.54% Rx=9906 Svc=10.7347% PER=0.0 Coll=0 (23.42s, 남은 약 38분)
+[20/121] isolated/algo1/sync=True K=1 rank=15 rep=1: PDR=1.23% Rx=1159 Svc=1.256% PER=0.0 Coll=0 (22.47s, 남은 약 37분)
+[21/121] isolated/algo1/sync=True K=1 rank=16 rep=1: PDR=10.78% Rx=10131 Svc=10.9785% PER=0.0 Coll=0 (21.33s, 남은 약 37분)
+[22/121] isolated/algo1/sync=True K=1 rank=17 rep=1: PDR=0.87% Rx=818 Svc=0.8864% PER=0.0 Coll=0 (19.68s, 남은 약 37분)
+[23/121] isolated/algo1/sync=True K=1 rank=18 rep=1: PDR=2.44% Rx=2293 Svc=2.4848% PER=0.0 Coll=0 (21.62s, 남은 약 36분)
+[24/121] isolated/algo1/sync=True K=1 rank=19 rep=1: PDR=2.79% Rx=2627 Svc=2.8468% PER=0.0 Coll=0 (19.28s, 남은 약 36분)
+[25/121] isolated/algo1/sync=True K=1 rank=20 rep=1: PDR=27.54% Rx=25888 Svc=28.115% PER=0.0 Coll=0 (26.32s, 남은 약 35분)
+[26/121] isolated/algo1/sync=True K=1 rank=21 rep=1: PDR=7.99% Rx=7511 Svc=8.1393% PER=0.0 Coll=0 (21.34s, 남은 약 35분)
+[27/121] isolated/algo1/sync=True K=1 rank=22 rep=1: PDR=2.93% Rx=2754 Svc=2.9844% PER=0.0 Coll=0 (21.29s, 남은 약 35분)
+[28/121] isolated/algo1/sync=True K=1 rank=23 rep=1: PDR=3.1% Rx=2911 Svc=3.1545% PER=0.0 Coll=0 (21.72s, 남은 약 34분)
+[29/121] isolated/algo1/sync=True K=1 rank=24 rep=1: PDR=0.11% Rx=103 Svc=0.1116% PER=0.0 Coll=0 (16.95s, 남은 약 34분)
+[30/121] isolated/algo1/sync=True K=1 rank=25 rep=1: PDR=1.22% Rx=1143 Svc=1.2386% PER=0.0 Coll=0 (21.09s, 남은 약 33분)
+[31/121] isolated/algo1/sync=True K=1 rank=26 rep=1: PDR=0.0% Rx=0 Svc=0.0% PER=0.0 Coll=0 (21.01s, 남은 약 33분)
+[32/121] isolated/algo1/sync=True K=1 rank=27 rep=1: PDR=1.7% Rx=1596 Svc=1.7295% PER=0.0 Coll=0 (21.76s, 남은 약 33분)
+[33/121] isolated/algo7/sync=False K=1 rank=1 rep=1: PDR=20.61% Rx=19385 Svc=21.4715% PER=0.0 Coll=0 (23.24s, 남은 약 32분)
+[34/121] isolated/algo7/sync=False K=1 rank=2 rep=1: PDR=20.09% Rx=18898 Svc=20.4789% PER=0.0 Coll=0 (22.38s, 남은 약 32분)
+[35/121] isolated/algo7/sync=False K=1 rank=3 rep=1: PDR=13.94% Rx=13109 Svc=14.2056% PER=0.0 Coll=0 (21.18s, 남은 약 32분)
+[36/121] isolated/algo7/sync=False K=1 rank=4 rep=1: PDR=5.7% Rx=5365 Svc=5.8138% PER=0.0 Coll=0 (22.45s, 남은 약 31분)
+[37/121] isolated/algo7/sync=False K=1 rank=5 rep=1: PDR=27.52% Rx=25884 Svc=28.1106% PER=0.0192 Coll=2 (24.21s, 남은 약 31분)
+[38/121] sweep/algo1/sync=True K=1 rep=1: PDR=31.52% Rx=29629 Svc=32.8246% PER=0.0 Coll=0 (23.94s, 남은 약 33분)
+[39/121] sweep/algo1/sync=True K=2 rep=1: PDR=22.96% Rx=43158 Svc=44.6247% PER=0.0 Coll=0 (28.72s, 남은 약 35분)
+[40/121] sweep/algo1/sync=True K=3 rep=1: PDR=15.95% Rx=44980 Svc=46.5479% PER=0.0 Coll=0 (28.85s, 남은 약 36분)
+[41/121] sweep/algo1/sync=True K=4 rep=1: PDR=15.17% Rx=57039 Svc=59.4358% PER=0.0 Coll=0 (33.0s, 남은 약 37분)
+[42/121] sweep/algo1/sync=True K=5 rep=1: PDR=13.17% Rx=61881 Svc=63.1554% PER=0.0 Coll=0 (34.12s, 남은 약 38분)
+[43/121] sweep/algo1/sync=True K=8 rep=1: PDR=11.28% Rx=84788 Svc=69.421% PER=0.0075 Coll=3 (46.06s, 남은 약 41분)
+[44/121] sweep/algo1/sync=True K=10 rep=1: PDR=9.67% Rx=90940 Svc=70.2227% PER=0.0 Coll=0 (50.61s, 남은 약 43분)
+nohup: ignoring input
+총 89 run 중 남은 것 62 (isolated 0, sweep 53, control 9) · 예상 23분 · 결과 폴더 experiment_results/step2/
+[1/62] sweep/algo7/sync=True K=1 rep=1: PDR=20.62% Rx=19382 Svc=21.4679% PER=0.0 Coll=0 (24.76s, 남은 약 25분)
+nohup: ignoring input
+총 89 run 중 남은 것 61 (isolated 0, sweep 52, control 9) · 예상 22분 · 결과 폴더 experiment_results/step2/
+[1/61] sweep/algo7/sync=True K=2 rep=1: PDR=19.24% Rx=36164 Svc=36.9191% PER=0.0 Coll=0 (41.71s, 남은 약 39분)
+[2/61] sweep/algo7/sync=True K=3 rep=1: PDR=17.99% Rx=50724 Svc=53.0382% PER=0.0 Coll=0 (30.7s, 남은 약 33분)
+[3/61] sweep/algo7/sync=True K=4 rep=1: PDR=14.91% Rx=56063 Svc=58.3188% PER=0.0 Coll=0 (27.0s, 남은 약 30분)
+[4/61] sweep/algo7/sync=True K=5 rep=1: PDR=17.65% Rx=82976 Svc=70.3516% PER=0.0 Coll=0 (32.71s, 남은 약 30분)
+[5/61] sweep/algo1/sync=True K=1 rep=2: PDR=31.28% Rx=29404 Svc=32.5757% PER=0.0 Coll=0 (23.35s, 남은 약 28분)
+[6/61] sweep/algo1/sync=True K=2 rep=2: PDR=22.96% Rx=43164 Svc=44.6271% PER=0.0 Coll=0 (31.53s, 남은 약 27분)
+[7/61] sweep/algo1/sync=True K=3 rep=2: PDR=15.95% Rx=44965 Svc=46.5327% PER=0.0 Coll=0 (31.6s, 남은 약 27분)
+[8/61] sweep/algo1/sync=True K=4 rep=2: PDR=15.27% Rx=57400 Svc=59.8016% PER=0.0 Coll=0 (32.39s, 남은 약 26분)
+[9/61] sweep/algo1/sync=True K=5 rep=2: PDR=13.17% Rx=61885 Svc=63.1554% PER=0.0016 Coll=1 (33.22s, 남은 약 26분)
+[10/61] sweep/algo1/sync=True K=8 rep=2: PDR=11.17% Rx=84026 Svc=69.141% PER=0.012 Coll=6 (62.86s, 남은 약 28분)
+[11/61] sweep/algo1/sync=True K=10 rep=2: PDR=9.67% Rx=90939 Svc=70.223% PER=0.0131 Coll=6 (69.76s, 남은 약 29분)
+[12/61] sweep/algo7/sync=True K=1 rep=2: PDR=20.63% Rx=19389 Svc=21.4759% PER=0.0 Coll=0 (30.76s, 남은 약 28분)
+[13/61] sweep/algo7/sync=True K=2 rep=2: PDR=19.23% Rx=36160 Svc=36.9069% PER=0.0 Coll=0 (30.36s, 남은 약 27분)
+[14/61] sweep/algo7/sync=True K=3 rep=2: PDR=17.98% Rx=50710 Svc=53.0307% PER=0.0 Coll=0 (27.0s, 남은 약 26분)
+[15/61] sweep/algo7/sync=True K=4 rep=2: PDR=14.86% Rx=55866 Svc=58.0956% PER=0.0 Coll=0 (30.54s, 남은 약 25분)
+[16/61] sweep/algo7/sync=True K=5 rep=2: PDR=17.65% Rx=82975 Svc=70.3461% PER=0.0 Coll=0 (33.64s, 남은 약 25분)
+[17/61] sweep/algo1/sync=True K=1 rep=3: PDR=31.28% Rx=29406 Svc=32.578% PER=0.0 Coll=0 (25.16s, 남은 약 24분)
+[18/61] sweep/algo1/sync=True K=2 rep=3: PDR=22.78% Rx=42826 Svc=44.2511% PER=0.007 Coll=2 (30.68s, 남은 약 23분)
+[19/61] sweep/algo1/sync=True K=3 rep=3: PDR=15.94% Rx=44957 Svc=46.5362% PER=0.0 Coll=0 (28.25s, 남은 약 22분)
+[20/61] sweep/algo1/sync=True K=4 rep=3: PDR=15.17% Rx=57049 Svc=59.4493% PER=0.0 Coll=0 (34.32s, 남은 약 22분)
+[21/61] sweep/algo1/sync=True K=5 rep=3: PDR=13.08% Rx=61499 Svc=62.4982% PER=0.0 Coll=0 (34.21s, 남은 약 21분)
+[22/61] sweep/algo1/sync=True K=8 rep=3: PDR=11.18% Rx=84039 Svc=69.1549% PER=0.0054 Coll=2 (60.59s, 남은 약 21분)
+[23/61] sweep/algo1/sync=True K=10 rep=3: PDR=9.53% Rx=89550 Svc=69.7666% PER=0.0175 Coll=9 (69.18s, 남은 약 21분)
+[24/61] sweep/algo7/sync=True K=1 rep=3: PDR=20.63% Rx=19388 Svc=21.4747% PER=0.0 Coll=0 (24.75s, 남은 약 20분)
+[25/61] sweep/algo7/sync=True K=2 rep=3: PDR=19.23% Rx=36160 Svc=36.9069% PER=0.0 Coll=0 (32.47s, 남은 약 20분)
+[26/61] sweep/algo7/sync=True K=3 rep=3: PDR=17.91% Rx=50499 Svc=52.807% PER=0.0 Coll=0 (31.25s, 남은 약 19분)
+[27/61] sweep/algo7/sync=True K=4 rep=3: PDR=14.91% Rx=56064 Svc=58.3149% PER=0.0 Coll=0 (32.47s, 남은 약 18분)
+[28/61] sweep/algo7/sync=True K=5 rep=3: PDR=17.65% Rx=82975 Svc=70.3561% PER=0.0 Coll=0 (36.55s, 남은 약 18분)
+[29/61] sweep/algo1/sync=True K=1 rep=4: PDR=31.52% Rx=29629 Svc=32.8246% PER=0.0 Coll=0 (26.35s, 남은 약 17분)
+[30/61] sweep/algo1/sync=True K=2 rep=4: PDR=22.96% Rx=43159 Svc=44.6235% PER=0.0 Coll=0 (31.6s, 남은 약 16분)
+[31/61] sweep/algo1/sync=True K=3 rep=4: PDR=15.94% Rx=44958 Svc=46.5401% PER=0.0155 Coll=4 (31.87s, 남은 약 16분)
+[32/61] sweep/algo1/sync=True K=4 rep=4: PDR=15.27% Rx=57398 Svc=59.8127% PER=0.0 Coll=0 (32.88s, 남은 약 15분)
+[33/61] sweep/algo1/sync=True K=5 rep=4: PDR=13.16% Rx=61869 Svc=63.1466% PER=0.0 Coll=0 (37.67s, 남은 약 15분)
+[34/61] sweep/algo1/sync=True K=8 rep=4: PDR=11.46% Rx=86143 Svc=69.9378% PER=0.0318 Coll=15 (62.03s, 남은 약 14분)
+[35/61] sweep/algo1/sync=True K=10 rep=4: PDR=9.67% Rx=90921 Svc=70.2077% PER=0.0192 Coll=8 (117.11s, 남은 약 14분)
+[36/61] sweep/algo7/sync=True K=1 rep=4: PDR=20.62% Rx=19385 Svc=21.4714% PER=0.0 Coll=0 (51.12s, 남은 약 14분)
+[37/61] sweep/algo7/sync=True K=2 rep=4: PDR=19.23% Rx=36159 Svc=36.9086% PER=0.0 Coll=0 (37.95s, 남은 약 13분)
+[38/61] sweep/algo7/sync=True K=3 rep=4: PDR=17.98% Rx=50710 Svc=53.0366% PER=0.0 Coll=0 (35.32s, 남은 약 12분)
+[39/61] sweep/algo7/sync=True K=4 rep=4: PDR=14.91% Rx=56066 Svc=58.3122% PER=0.0 Coll=0 (28.3s, 남은 약 12분)
+[40/61] sweep/algo7/sync=True K=5 rep=4: PDR=17.65% Rx=82973 Svc=70.3572% PER=0.0168 Coll=7 (27.62s, 남은 약 11분)
+[41/61] sweep/algo1/sync=True K=1 rep=5: PDR=31.28% Rx=29400 Svc=32.5715% PER=0.0338 Coll=5 (22.79s, 남은 약 10분)
+[42/61] sweep/algo1/sync=True K=2 rep=5: PDR=22.96% Rx=43164 Svc=44.6247% PER=0.0276 Coll=6 (27.22s, 남은 약 10분)
+[43/61] sweep/algo1/sync=True K=3 rep=5: PDR=15.95% Rx=44970 Svc=46.5384% PER=0.0 Coll=0 (30.19s, 남은 약 9분)
+[44/61] sweep/algo1/sync=True K=4 rep=5: PDR=15.26% Rx=57392 Svc=59.8077% PER=0.0 Coll=0 (30.07s, 남은 약 8분)
+[45/61] sweep/algo1/sync=True K=5 rep=5: PDR=13.17% Rx=61896 Svc=63.1695% PER=0.0 Coll=0 (39.78s, 남은 약 8분)
+[46/61] sweep/algo1/sync=True K=8 rep=5: PDR=11.17% Rx=83999 Svc=69.1347% PER=0.036 Coll=14 (78.34s, 남은 약 7분)
+[47/61] sweep/algo1/sync=True K=10 rep=5: PDR=9.55% Rx=89734 Svc=69.6998% PER=0.0113 Coll=6 (73.79s, 남은 약 7분)
+[48/61] sweep/algo7/sync=True K=1 rep=5: PDR=20.63% Rx=19389 Svc=21.4759% PER=0.0 Coll=0 (30.57s, 남은 약 6분)
+[49/61] sweep/algo7/sync=True K=2 rep=5: PDR=19.23% Rx=36158 Svc=36.9073% PER=0.0 Coll=0 (41.85s, 남은 약 5분)
+[50/61] sweep/algo7/sync=True K=3 rep=5: PDR=17.91% Rx=50515 Svc=52.8133% PER=0.0 Coll=0 (41.09s, 남은 약 5분)
+[51/61] sweep/algo7/sync=True K=4 rep=5: PDR=14.91% Rx=56066 Svc=58.3248% PER=0.0 Coll=0 (41.25s, 남은 약 4분)
+[52/61] sweep/algo7/sync=True K=5 rep=5: PDR=17.65% Rx=82966 Svc=70.3422% PER=0.0024 Coll=1 (36.66s, 남은 약 3분)
+[53/61] control/algo7/sync=False K=1 rep=1: PDR=20.61% Rx=19385 Svc=21.4715% PER=0.0 Coll=0 (28.62s, 남은 약 4분)
+[54/61] control/algo7/sync=False K=3 rep=1: PDR=16.7% Rx=47117 Svc=52.1875% PER=6.7143 Coll=570 (30.53s, 남은 약 3분)
+[55/61] control/algo7/sync=False K=5 rep=1: PDR=10.5% Rx=49352 Svc=54.6749% PER=40.3617 Coll=14371 (38.94s, 남은 약 3분)
+[56/61] control/algo7/sync=False K=1 rep=2: PDR=20.9% Rx=19656 Svc=21.7713% PER=0.0 Coll=0 (28.94s, 남은 약 3분)
+[57/61] control/algo7/sync=False K=3 rep=2: PDR=16.59% Rx=46809 Svc=51.8464% PER=7.6946 Coll=1084 (37.59s, 남은 약 2분)
+[58/61] control/algo7/sync=False K=5 rep=2: PDR=10.45% Rx=49144 Svc=54.1974% PER=40.5375 Coll=14460 (46.37s, 남은 약 2분)
+[59/61] control/algo7/sync=False K=1 rep=3: PDR=20.61% Rx=19383 Svc=21.4689% PER=0.0 Coll=0 (41.47s, 남은 약 1분)
+[60/61] control/algo7/sync=False K=3 rep=3: PDR=16.59% Rx=46800 Svc=51.8373% PER=7.6941 Coll=1087 (55.35s, 남은 약 1분)
+[61/61] control/algo7/sync=False K=5 rep=3: PDR=10.59% Rx=49785 Svc=54.9052% PER=39.8923 Coll=13990 (40.99s, 남은 약 0분)
+
+이번 세션 소요 39.6분
+
+  Phase  Algo  Sync  K  N  PDR_mean  Total_Received_mean  Service_Ratio_mean  Jain_RSU_mean  PER_mean  Collisions_mean  RSSI_Mean_dBm_mean    Eta  Max_RSU_Loss_pct  Max_RSU_Gain_pct  Elapsed_Sec_mean
+control algo7 False  1  3    20.707            19474.667              21.571          1.000     0.000            0.000             -76.366 -0.005             0.000             0.460            33.010
+control algo7 False  3  3    16.627            46908.667              51.957          0.982     7.368          913.667             -75.039  0.087            26.030             9.590            41.157
+control algo7 False  5  3    10.513            49427.000              54.593          0.919    40.264        14273.667             -72.290  0.402            59.200             0.000            42.100
+  sweep algo1  True  1  5    31.376            29493.600              32.675          1.000     0.007            1.000             -77.702  0.005             0.460             0.000            24.318
+  sweep algo1  True  2  5    22.924            43094.200              44.550          0.881     0.007            1.600             -76.605 -0.008             0.600             4.100            29.950
+  sweep algo1  True  3  5    15.946            44966.000              46.539          0.638     0.003            0.800             -76.325 -0.014             0.790            13.250            30.152
+  sweep algo1  True  4  5    15.228            57255.600              59.661          0.677     0.000            0.000             -76.720 -0.003             2.390            12.630            32.532
+  sweep algo1  True  5  5    13.150            61806.000              63.025          0.622     0.000            0.200             -76.506  0.006            12.150            10.470            35.800
+  sweep algo1  True  8  5    11.252            84599.000              69.358          0.625     0.019            8.000             -76.142  0.069            16.870            13.620            61.976
+  sweep algo1  True 10  5     9.618            90416.800              70.024          0.559     0.012            5.800             -76.418  0.055            16.840            48.710            76.090
+  sweep algo7  True  1  5    20.626            19386.600              21.473          1.000     0.000            0.000             -76.326 -0.000             0.000             0.020            32.392
+  sweep algo7  True  2  5    19.232            36160.200              36.910          0.995     0.000            0.000             -75.934  0.055            11.260             0.040            36.868
+  sweep algo7  True  3  5    17.954            50631.600              52.945          0.984     0.000            0.000             -75.505  0.015            11.000             9.230            33.072
+  sweep algo7  True  4  5    14.900            56025.000              58.273          0.875     0.000            0.000             -75.132  0.013            11.130            10.140            31.912
+  sweep algo7  True  5  5    17.650            82973.000              70.351          0.864     0.004            1.600             -75.925 -0.004             6.240             8.800            33.436
+
+저장 위치: experiment_results/step2/

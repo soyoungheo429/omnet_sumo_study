@@ -1,0 +1,2 @@
+﻿K,Repeat,Seed,Total_Generated,Num_Vehicles,Expected_Received,Actual_Received,PDR(%),Elapsed_Sec,Bitrate,AvoidBeaconSync
+1,1,248675,2000,47,94000,19385,20.62,4.45,6Mbps,true

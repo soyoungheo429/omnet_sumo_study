@@ -1,0 +1,3 @@
+﻿Algo,Selection_Sec,Selection_Sims,Note
+algo1,0.0496,0,"교차로 차수/밀집도 규칙. net.xml 파싱 포함, 3회 중앙값, 시뮬레이션 0회"
+algo7,0.1172,0,"Greedy max coverage(r=150m, K=27). 스냅샷/교차로 로딩 포함, 3회 중앙값, 시뮬레이션 0회"
