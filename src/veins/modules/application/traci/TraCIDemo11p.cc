@@ -1,5 +1,9 @@
 #include "veins/modules/application/traci/TraCIDemo11p.h" // 헤더 파일 포함
 #include "veins/modules/application/traci/TraCIDemo11pMessage_m.h" // 메시지 구조 정의 파일 포함
+#include "veins/base/phyLayer/PhyToMacControlInfo.h" // [metrics]
+#include "veins/modules/phy/DeciderResult80211.h" // [metrics]
+
+#include <cmath>
 
 using namespace veins; // veins 네임스페이스 사용
 
@@ -13,6 +17,50 @@ void TraCIDemo11p::initialize(int stage)
         sentMessage = false; // 메시지 전송 여부 초기화
         lastDroveAt = simTime(); // 마지막 주행 시간 초기화 (현재 시간)
         currentSubscribedServiceId = -1; // 구독 중인 서비스 ID 초기화 (없음)
+        // [metrics] 계측 변수 초기화
+        rxFromRsu.clear();
+        rxFromMac.clear();
+        rxSlots.clear();
+        rssiSum_dBm = 0;
+        snrSum_dB = 0;
+        rxMeasured = 0;
+        createdAt = simTime();
+    }
+}
+
+// [metrics] RSU가 보낸 BSM을 받을 때마다 수신 세기/SNR/송신 RSU/슬롯을 기록
+void TraCIDemo11p::onBSM(DemoSafetyMessage* bsm)
+{
+    if (auto* ci = dynamic_cast<PhyToMacControlInfo*>(bsm->getControlInfo())) {
+        rxFromMac[(long) ci->getSourceAddress()]++;
+    }
+    if (auto* res = dynamic_cast<DeciderResult80211*>(PhyToMacControlInfo::getDeciderResult(bsm))) {
+        rssiSum_dBm += res->getRecvPower_dBm();
+        double snr = res->getSnr();
+        snrSum_dB += (snr > 0) ? 10 * std::log10(snr) : 0;
+        rxMeasured++;
+    }
+    // RSU는 고정 위치라 senderPos가 곧 RSU ID 역할 (파이썬에서 ini 좌표와 매칭)
+    Coord p = bsm->getSenderPos();
+    std::string key = std::to_string((long) std::lround(p.x)) + "_" + std::to_string((long) std::lround(p.y));
+    rxFromRsu[key]++;
+    rxSlots.insert((long) std::floor(simTime().dbl() / METRIC_SLOT_SEC));
+}
+
+// [metrics] 종료 시 스칼라 기록 (.sca의 node[i].appl 아래에 찍힘)
+void TraCIDemo11p::finish()
+{
+    DemoBaseApplLayer::finish();
+    recordScalar("metricRxMeasured", rxMeasured);
+    recordScalar("metricRssiSum_dBm", rssiSum_dBm);
+    recordScalar("metricSnrSum_dB", snrSum_dB);
+    recordScalar("metricUniqueRxSlots", (double) rxSlots.size());
+    recordScalar("metricAliveTime", (simTime() - createdAt).dbl());
+    for (auto& kv : rxFromRsu) {
+        recordScalar(("metricRxFrom_" + kv.first).c_str(), kv.second);
+    }
+    for (auto& kv : rxFromMac) {
+        recordScalar(("metricRxFromMac_" + std::to_string(kv.first)).c_str(), kv.second);
     }
 }
 

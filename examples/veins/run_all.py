@@ -174,16 +174,11 @@ def run_candidate_list_combo(combo: dict) -> None:
                 )
                 sim_runner.reset_results_dir()
                 success, elapsed, stdout_text = sim_runner.run_simulation(verbose=False)
+                # [metrics] PDR + 수신총량/서비스율/Jain/PER/충돌/RSSI 등 전체 지표
                 result = (
-                    sim_runner.parse_pdr()
+                    sim_runner.parse_all(coords)
                     if success
-                    else {
-                        "Total_Generated": 0,
-                        "Num_Vehicles": 0,
-                        "Expected_Received": 0,
-                        "Actual_Received": 0,
-                        "PDR": 0.0,
-                    }
+                    else sim_runner.empty_result()
                 )
                 result.update(
                     {

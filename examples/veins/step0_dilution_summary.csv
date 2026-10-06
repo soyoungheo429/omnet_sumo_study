@@ -1,0 +1,5 @@
+﻿Dataset,K_range,MAE_PDR_vs_dilution(%p),max_abs_err(%p),eta_mean,eta_max,up/down_direction_agreement,num_K_where_PDR_rose
+algo1 · 6Mbps,1–18,0.481,0.889,0.043,0.1037,0.941,2
+algo7 · 6Mbps,1–5,0.326,1.13,0.0161,0.0555,1.0,1
+algo7 · 27Mbps,1–27,0.29,2.1,-0.0428,-0.0211,1.0,0
+"algo7 · 27Mbps (legacy coords, 30 runs)",1–27,0.003,0.01,0.0039,0.0164,1.0,5

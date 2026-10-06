@@ -129,3 +129,26 @@ def parse_pdr() -> dict:
         "Actual_Received": total_received,
         "PDR": round(pdr, 2),
     }
+
+
+def parse_all(rsu_coords: list = None) -> dict:
+    """[metrics] 기존 parse_pdr() 키 + 논문용 지표 전체를 한 번에 반환.
+    rsu_coords는 write_ini()에 넘긴 좌표 리스트 그대로 넘기면 RSU index별 수신량이 매칭된다."""
+    from rsu_lib import metrics  # 순환 import 방지용 지연 import
+
+    base = parse_pdr()
+    m = metrics.parse_metrics(RESULT_SCA, rsu_coords)
+    base.update({k: v for k, v in m.items() if k not in ("PDR", "Total_Generated")})
+    return base
+
+
+def empty_result() -> dict:
+    """시뮬레이션 실패 시 같은 컬럼 구조를 유지하기 위한 빈 결과."""
+    nan = float("nan")
+    return {
+        "Total_Generated": 0, "Num_Vehicles": 0, "Expected_Received": 0,
+        "Actual_Received": 0, "PDR": 0.0, "Num_RSUs": 0, "Total_Received": 0,
+        "Service_Ratio": nan, "Jain_RSU": nan, "Jain_Vehicle": nan, "PER": nan,
+        "Collisions": 0, "RXTX_Lost": 0, "RSSI_Mean_dBm": nan, "SNR_Mean_dB": nan,
+        "Channel_Busy": nan, "PerRSU_Rx": "[]", "PerRSU_Source": "none", "Metrics_OK": False,
+    }

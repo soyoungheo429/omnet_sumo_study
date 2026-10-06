@@ -24,6 +24,10 @@
 
 #include "veins/modules/application/ieee80211p/DemoBaseApplLayer.h"
 
+#include <map>
+#include <set>
+#include <string>
+
 namespace veins {
 
 /**
@@ -43,8 +47,21 @@ namespace veins {
 class VEINS_API TraCIDemo11p : public DemoBaseApplLayer {
 public:
     void initialize(int stage) override;
+    void finish() override;
 
 protected:
+    // [metrics] 논문용 수신 지표 계측 (RSSI / SNR / RSU별 부하 / 차량 서비스 슬롯)
+    static constexpr double METRIC_SLOT_SEC = 0.1; // RSU beaconInterval과 동일
+    std::map<std::string, long> rxFromRsu; // key = 송신 RSU 좌표 "x_y" (정수 반올림)
+    std::map<long, long> rxFromMac; // key = 송신 MAC 주소 (좌표 키가 깨질 때 대비용)
+    std::set<long> rxSlots; // BSM을 1개 이상 받은 0.1초 슬롯 번호
+    double rssiSum_dBm = 0;
+    double snrSum_dB = 0;
+    long rxMeasured = 0;
+    simtime_t createdAt;
+
+    void onBSM(DemoSafetyMessage* bsm) override;
+
     simtime_t lastDroveAt;
     bool sentMessage;
     int currentSubscribedServiceId;
