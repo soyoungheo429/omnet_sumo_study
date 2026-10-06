@@ -65,7 +65,10 @@ def _run_sim(timeout):
             os.killpg(os.getpgid(p.pid), signal.SIGKILL)
         except ProcessLookupError:
             pass
-        out, _ = p.communicate()
+        try:
+            out, _ = p.communicate(timeout=15)
+        except subprocess.TimeoutExpired:
+            out = ""  # 자식이 파이프를 잡고 있어도 더 기다리지 않는다
         return False, time.time() - t0, "TIMEOUT " + (out or "")[-300:]
     out = out or ""
     return (p.returncode == 0 and "<!> Error" not in out), time.time() - t0, out

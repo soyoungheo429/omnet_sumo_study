@@ -54,6 +54,7 @@ def main():
     ap.add_argument("--out", default=os.path.join("experiment_results", "step3"))
     ap.add_argument("--ks", default="2,3,4,5")
     ap.add_argument("--repeats", type=int, default=1)
+    ap.add_argument("--max-top-k", type=int, default=99, help="top 방식은 이 K까지만 실행 (겹친 좌표 3개 이상에서 시뮬이 멈추는 문제 회피)")
     ap.add_argument("--min-sep", type=float, default=300.0)
     ap.add_argument("--bitrate", default="6Mbps")
     ap.add_argument("--timeout", type=int, default=1800)
@@ -73,7 +74,8 @@ def main():
     plan = [("single", 1, [ordered[0]])]
     for k in ks:
         top = ordered[:k]
-        plan.append(("top", k, top))
+        if k <= a.max_top_k:
+            plan.append(("top", k, top))
         div = pick(ordered, k, a.min_sep)
         if div is None:
             print(f"[경고] K={k}: min-sep {a.min_sep} m 를 만족하는 점이 부족해서 diverse 생략")
