@@ -10,8 +10,11 @@ step4_fixed_algorithms.py 가 만든 배치(step4_placements.csv)를 실제 시�
 출력 (experiment_results/step4/):
   step4_verify_raw.csv       run 1개 = 1행 (모든 지표 + 근사모델 예측값)
   step4_verify_summary.csv   방법×K: 실측 서비스비율/PDR/총수신량/Jain/PER + 예측
-  step4_verify_plot.png      K별 실측 서비스 비율 (기존 vs 수정 알고리즘)
+  step4_verify_table.csv/.md 방법×K × 지표 10개 표 (PDR, 총수신량, 서비스비율, Jain RSU/차량, RSSI, PER, 충돌, 채널점유율)
+  step4_verify_metrics_grid.png  지표 9개 × K 그래프 (기존 = 점선)
+  step4_verify_pred_vs_meas.png  근사모델 예측 vs 실측 서비스 비율
 실행:  python3 -u step4_verify_sim.py --timeout 300 2>&1 | tee step4_log.txt
+       표·그래프만 다시 만들기: python3 step4_verify_sim.py --summarize-only
        (테스트: --mock / 예정만 보기: --dry-run)
 ================================================================
 """
@@ -36,7 +39,15 @@ from rsu_lib import sim_eval  # noqa: E402
 OUT = os.path.join("experiment_results", "step4")
 DEFAULT_METHODS = "Greedy-교차로 (algo1 수정),Greedy-전체교차로 (algo7 수정),GA-집합 (도로점),PPO,DQN,최적해(ILP)"
 COLS = ["Key", "Methods", "K", "Rep", "Seed", "Coords", "Pred_Cover", "Success", "Elapsed_Sec", "PDR", "Service_Ratio",
-        "Total_Received", "Jain_RSU", "Jain_Vehicle", "PER", "Collisions", "RSSI_Mean_dBm", "Metrics_OK", "Error"]
+        "Total_Received", "Jain_RSU", "Jain_Vehicle", "PER", "Collisions", "RSSI_Mean_dBm", "SNR_Mean_dB",
+        "Channel_Busy", "RXTX_Lost", "Metrics_OK", "Error"]
+# 표/그래프에 쓰는 지표 (순서 = 표 열 순서)
+METRICS = [("PDR", "PDR(%)"), ("Total_Received", "총 수신량"), ("Service_Ratio", "서비스 비율(%)"),
+           ("Jain_RSU", "Jain RSU"), ("Jain_Vehicle", "Jain 차량"), ("RSSI_Mean_dBm", "RSSI(dBm)"),
+           ("PER", "PER(%)"), ("Collisions", "충돌 수"), ("Channel_Busy", "채널 점유율(%)")]
+METRICS_EN = {"PDR": "PDR (%)", "Total_Received": "Total received BSMs", "Service_Ratio": "Service ratio (%)",
+              "Jain_RSU": "Jain index (RSU)", "Jain_Vehicle": "Jain index (vehicle)", "RSSI_Mean_dBm": "Mean RSSI (dBm)",
+              "PER": "PER (%)", "Collisions": "Collisions", "Channel_Busy": "Channel busy (%)"}
 EN = {"Greedy-교차로 (algo1 수정)": "Greedy-intersection (algo1 fixed)", "Greedy-전체교차로 (algo7 수정)": "Greedy-all junctions (algo7 fixed)",
       "GA-집합 (도로점)": "Set-GA (road points)", "PPO": "PPO", "DQN": "DQN", "최적해(ILP)": "Optimal (ILP)",
       "algo1 (기존)": "algo1 (old, step2)", "algo7 (기존)": "algo7 (old, step2)"}
@@ -103,7 +114,7 @@ def main():
         return
     raw = pd.read_csv(raw_path)
     raw = raw[raw.Success.astype(str) == "True"]
-    met = ["Service_Ratio", "PDR", "Total_Received", "Jain_RSU", "Jain_Vehicle", "PER", "Collisions", "RSSI_Mean_dBm"]
+    met = [m for m, _ in METRICS]
     rows = []
     for _, r in raw.groupby("Key").agg({**{m: "mean" for m in met}, "K": "first", "Methods": "first", "Pred_Cover": "first"}).iterrows():
         for m in r.Methods.split("|"):
@@ -129,17 +140,45 @@ def main():
         print(f"\n예측 vs 실측 서비스 비율: r={np.corrcoef(v.Pred_Cover, v.Service_Ratio)[0, 1]:.3f}, "
               f"평균오차 {np.mean(np.abs(v.Pred_Cover - v.Service_Ratio)):.2f}%p")
 
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4.4))
-    for m in [x for x in COL if x in set(S.Method)]:
-        s = S[S.Method == m].sort_values("K")
-        ls = "--" if "기존" in m else "-"
-        axes[0].plot(s.K, s.Service_Ratio, marker="o", ms=4, ls=ls, color=COL[m], label=EN[m])
-        axes[1].plot(s.K, s.PDR, marker="o", ms=4, ls=ls, color=COL[m], label=EN[m])
-    axes[0].set_ylabel("Measured service ratio (%)"); axes[1].set_ylabel("Measured PDR (%)")
-    for ax, t in zip(axes, ("Service ratio (OMNeT++/Veins)", "PDR (OMNeT++/Veins)")):
-        ax.set_xlabel("K (number of RSUs)"); ax.grid(color="#e6e5e0"); ax.set_title(t, loc="left", fontsize=11)
-    axes[0].legend(frameon=False, fontsize=8)
-    plt.tight_layout(); plt.savefig(os.path.join(OUT, "step4_verify_plot.png"), dpi=150)
+    # ---------- 표 (Excel/Notion용) ----------
+    T = S[["Method", "K"] + met + ["Pred_Cover"]].copy()
+    T.columns = ["방법", "K"] + [k for _, k in METRICS] + ["예측 커버(%)"]
+    T = T.round({"PDR(%)": 2, "총 수신량": 0, "서비스 비율(%)": 2, "Jain RSU": 3, "Jain 차량": 3, "RSSI(dBm)": 2,
+                 "PER(%)": 3, "충돌 수": 1, "채널 점유율(%)": 2, "예측 커버(%)": 1})
+    T.to_csv(os.path.join(OUT, "step4_verify_table.csv"), index=False, encoding="utf-8-sig")
+    with open(os.path.join(OUT, "step4_verify_table.md"), "w", encoding="utf-8") as f:
+        f.write("| " + " | ".join(T.columns) + " |\n|" + "---|" * len(T.columns) + "\n")
+        for r in T.itertuples(index=False):
+            f.write("| " + " | ".join("" if (isinstance(v, float) and np.isnan(v)) else str(v) for v in r) + " |\n")
+
+    # ---------- 그래프: 지표 9개 × K ----------
+    fig, axes = plt.subplots(3, 3, figsize=(15, 11))
+    order = [x for x in COL if x in set(S.Method)]
+    for ax, (m_key, _) in zip(axes.ravel(), METRICS):
+        for m in order:
+            s = S[S.Method == m].sort_values("K")
+            ls = "--" if "기존" in m else "-"
+            ax.plot(s.K, s[m_key], marker="o", ms=3.5, lw=1.6, ls=ls, color=COL[m], label=EN[m])
+        ax.set_title(METRICS_EN[m_key], loc="left", fontsize=11)
+        ax.set_xlabel("K (number of RSUs)"); ax.grid(color="#e6e5e0")
+    axes[0, 0].legend(frameon=False, fontsize=7.5)
+    fig.suptitle("Step4 verification in OMNeT++/Veins: all metrics vs K (dashed = old algorithms from step2)",
+                 x=0.01, ha="left", fontsize=12)
+    plt.tight_layout(); plt.savefig(os.path.join(OUT, "step4_verify_metrics_grid.png"), dpi=150); plt.close()
+
+    # 예측 vs 실측 산점도
+    v = S.dropna(subset=["Pred_Cover"])
+    if len(v) > 2:
+        fig, ax = plt.subplots(figsize=(5, 4.8))
+        for m in order:
+            s = v[v.Method == m]
+            ax.scatter(s.Pred_Cover, s.Service_Ratio, s=22, color=COL[m], label=EN[m])
+        lim = max(v.Pred_Cover.max(), v.Service_Ratio.max()) + 3
+        ax.plot([0, lim], [0, lim], color="#52514e", ls="--", lw=1)
+        ax.set_xlabel("Surrogate prediction (%)"); ax.set_ylabel("Measured service ratio (%)")
+        ax.set_title(f"Prediction vs simulation  r={np.corrcoef(v.Pred_Cover, v.Service_Ratio)[0, 1]:.3f}", loc="left", fontsize=11)
+        ax.grid(color="#e6e5e0"); ax.legend(frameon=False, fontsize=7)
+        plt.tight_layout(); plt.savefig(os.path.join(OUT, "step4_verify_pred_vs_meas.png"), dpi=150); plt.close()
     print("저장:", OUT)
 
 
