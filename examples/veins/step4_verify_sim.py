@@ -15,6 +15,8 @@ step4_fixed_algorithms.py 가 만든 배치(step4_placements.csv)를 실제 시�
   step4_verify_pred_vs_meas.png  근사모델 예측 vs 실측 서비스 비율
 실행:  python3 -u step4_verify_sim.py --timeout 300 2>&1 | tee step4_log.txt
        표·그래프만 다시 만들기: python3 step4_verify_sim.py --summarize-only
+       공평도 배치 검증: python3 -u step4_verify_sim.py --placements experiment_results/step4/step4_fair_placements.csv \
+                          --methods "Greedy(f),GA(f),PPO(f)" --ks 5,8,10 --tag _fair --timeout 300
        (테스트: --mock / 예정만 보기: --dry-run)
 ================================================================
 """
@@ -50,10 +52,11 @@ METRICS_EN = {"PDR": "PDR (%)", "Total_Received": "Total received BSMs", "Servic
               "PER": "PER (%)", "Collisions": "Collisions", "Channel_Busy": "Channel busy (%)"}
 EN = {"Greedy-교차로 (algo1 수정)": "Greedy-intersection (algo1 fixed)", "Greedy-전체교차로 (algo7 수정)": "Greedy-all junctions (algo7 fixed)",
       "GA-집합 (도로점)": "Set-GA (road points)", "PPO": "PPO", "DQN": "DQN", "최적해(ILP)": "Optimal (ILP)",
-      "algo1 (기존)": "algo1 (old, step2)", "algo7 (기존)": "algo7 (old, step2)"}
+      "algo1 (기존)": "algo1 (old, step2)", "algo7 (기존)": "algo7 (old, step2)",
+      "Greedy(f)": "Greedy (coverage×Jain)", "GA(f)": "Set-GA (coverage×Jain)", "PPO(f)": "PPO (coverage×Jain)"}
 COL = {"algo1 (기존)": "#b9b8b2", "algo7 (기존)": "#8d8c86", "Greedy-교차로 (algo1 수정)": "#2a6fdb",
        "Greedy-전체교차로 (algo7 수정)": "#1b998b", "GA-집합 (도로점)": "#eb6834", "PPO": "#8e44ad", "DQN": "#c0392b",
-       "최적해(ILP)": "#0b0b0b"}
+       "최적해(ILP)": "#0b0b0b", "Greedy(f)": "#2a6fdb", "GA(f)": "#eb6834", "PPO(f)": "#8e44ad"}
 
 
 def migrate_raw(path):
@@ -88,10 +91,12 @@ def main():
     ap.add_argument("--mock", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--summarize-only", action="store_true")
+    ap.add_argument("--placements", default=os.path.join(OUT, "step4_placements.csv"), help="검증할 배치 CSV")
+    ap.add_argument("--tag", default="", help="출력 파일 꼬리표 (예: _fair → step4_verify_raw_fair.csv)")
     a = ap.parse_args()
-    raw_path = os.path.join(OUT, "step4_verify_raw.csv")
+    raw_path = os.path.join(OUT, f"step4_verify_raw{a.tag}.csv")
     migrate_raw(raw_path)
-    P = pd.read_csv(os.path.join(OUT, "step4_placements.csv"), encoding="utf-8-sig")
+    P = pd.read_csv(a.placements, encoding="utf-8-sig")
     methods = [m.strip() for m in a.methods.split(",")]
     ks = [int(k) for k in a.ks.split(",")]
 
@@ -157,7 +162,7 @@ def main():
                 rows.append(dict(Method=lab, K=int(r.K), Pred_Cover=old_pred.get((lab, int(r.K))),
                                  **{m: getattr(r, m + "_mean") for m in met}))
     S = pd.DataFrame(rows).sort_values(["K", "Method"])
-    S.to_csv(os.path.join(OUT, "step4_verify_summary.csv"), index=False, encoding="utf-8-sig")
+    S.to_csv(os.path.join(OUT, f"step4_verify_summary{a.tag}.csv"), index=False, encoding="utf-8-sig")
     print(S.round(2).to_string(index=False))
     if len(S.dropna(subset=["Pred_Cover"])) > 2:
         v = S.dropna(subset=["Pred_Cover"])
@@ -169,8 +174,8 @@ def main():
     T.columns = ["방법", "K"] + [k for _, k in METRICS] + ["예측 커버(%)"]
     T = T.round({"PDR(%)": 2, "총 수신량": 0, "서비스 비율(%)": 2, "Jain RSU": 3, "Jain 차량": 3, "RSSI(dBm)": 2,
                  "PER(%)": 3, "충돌 수": 1, "채널 점유율(%)": 2, "예측 커버(%)": 1})
-    T.to_csv(os.path.join(OUT, "step4_verify_table.csv"), index=False, encoding="utf-8-sig")
-    with open(os.path.join(OUT, "step4_verify_table.md"), "w", encoding="utf-8") as f:
+    T.to_csv(os.path.join(OUT, f"step4_verify_table{a.tag}.csv"), index=False, encoding="utf-8-sig")
+    with open(os.path.join(OUT, f"step4_verify_table{a.tag}.md"), "w", encoding="utf-8") as f:
         f.write("| " + " | ".join(T.columns) + " |\n|" + "---|" * len(T.columns) + "\n")
         for r in T.itertuples(index=False):
             f.write("| " + " | ".join("" if (isinstance(v, float) and np.isnan(v)) else str(v) for v in r) + " |\n")
@@ -188,7 +193,7 @@ def main():
     axes[0, 0].legend(frameon=False, fontsize=7.5)
     fig.suptitle("Step4 verification in OMNeT++/Veins: all metrics vs K (dashed = old algorithms from step2)",
                  x=0.01, ha="left", fontsize=12)
-    plt.tight_layout(); plt.savefig(os.path.join(OUT, "step4_verify_metrics_grid.png"), dpi=150); plt.close()
+    plt.tight_layout(); plt.savefig(os.path.join(OUT, f"step4_verify_metrics_grid{a.tag}.png"), dpi=150); plt.close()
 
     # 예측 vs 실측 산점도
     v = S.dropna(subset=["Pred_Cover"])
@@ -202,7 +207,7 @@ def main():
         ax.set_xlabel("Surrogate prediction (%)"); ax.set_ylabel("Measured service ratio (%)")
         ax.set_title(f"Prediction vs simulation  r={np.corrcoef(v.Pred_Cover, v.Service_Ratio)[0, 1]:.3f}", loc="left", fontsize=11)
         ax.grid(color="#e6e5e0"); ax.legend(frameon=False, fontsize=7)
-        plt.tight_layout(); plt.savefig(os.path.join(OUT, "step4_verify_pred_vs_meas.png"), dpi=150); plt.close()
+        plt.tight_layout(); plt.savefig(os.path.join(OUT, f"step4_verify_pred_vs_meas{a.tag}.png"), dpi=150); plt.close()
     print("저장:", OUT)
 
 
