@@ -45,5 +45,7 @@ void TraCIDemoRSU11p::onWSM(BaseFrame1609_4* frame)
 
         // 지연 전송, 예약 전송 : 받은 메시지를 2초 뒤, 랜덤 지연 포함해 재전송한다. (dup 복사)
         // 하위 계층으로 메시지를 내려보낸다.
+    // [echo-fix] 같은 메시지(같은 treeId: dup해도 유지됨)는 RSU마다 한 번만 재전송
+    if (!relayedTreeIds.insert(wsm->getTreeId()).second) return;
     sendDelayedDown(wsm->dup(), 2 + uniform(0.01, 0.2));
 }

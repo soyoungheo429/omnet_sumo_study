@@ -24,6 +24,8 @@
 
 #include "veins/modules/application/ieee80211p/DemoBaseApplLayer.h"
 
+#include <set> // [echo-fix]
+
 namespace veins {
 
 /**
@@ -31,6 +33,9 @@ namespace veins {
  */
 class VEINS_API TraCIDemoRSU11p : public DemoBaseApplLayer {
 protected:
+    // [echo-fix] 이미 재전송한 메시지(treeId) 기록 → 같은 메시지는 한 번만 재전송
+    //  (원본은 무조건 재전송해서, 서로 닿는 RSU가 3개 이상 이어지면 메시지가 2초마다 배로 늘어남)
+    std::set<long> relayedTreeIds;
     void onWSM(BaseFrame1609_4* wsm) override;
     void onWSA(DemoServiceAdvertisment* wsa) override;
 };

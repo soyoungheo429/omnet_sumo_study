@@ -1,0 +1,63 @@
+﻿src,method,K,result,RSU_links,max_degree
+step4,Greedy-교차로 (al,1,OK 55s,0,0
+step4,GA-집합 (도로점),1,OK 66s,0,0
+step4,Greedy-교차로 (al,2,OK 35s,0,0
+step4,GA-집합 (도로점),2,OK 16s,0,0
+step4,Greedy-교차로 (al,3,OK 17s,0,0
+step4,GA-집합 (도로점),3,OK 22s,0,0
+step4,Greedy-교차로 (al,4,OK 28s,0,0
+step4,GA-집합 (도로점),4,OK 32s,0,0
+step4,PPO,4,OK 28s,0,0
+step4,Greedy-교차로 (al,5,OK 28s,0,0
+step4,GA-집합 (도로점),5,OK 42s,0,0
+step4,Greedy-교차로 (al,6,OK 41s,0,0
+step4,Greedy-전체교차로 (,6,OK 23s,0,0
+step4,GA-집합 (도로점),6,OK 25s,0,0
+step4,PPO,6,OK 24s,0,0
+step4,Greedy-교차로 (al,7,OK 26s,0,0
+step4,Greedy-전체교차로 (,7,OK 44s,0,0
+step4,GA-집합 (도로점),7,OK 97s,1,1
+step4,Greedy-교차로 (al,8,OK 53s,0,0
+step4,Greedy-전체교차로 (,8,OK 37s,0,0
+step4,GA-집합 (도로점),8,OK 27s,0,0
+step4,PPO,8,OK 33s,0,0
+step4,DQN,8,OK 31s,0,0
+step4,최적해(ILP),8,OK 38s,0,0
+step4,Greedy-교차로 (al,9,OK 40s,0,0
+step4,Greedy-전체교차로 (,9,OK 35s,0,0
+step4,GA-집합 (도로점),9,OK 37s,0,0
+step4,PPO,9,OK 39s,0,0
+step4,DQN,9,OK 43s,0,0
+step4,최적해(ILP),9,OK 41s,1,1
+step4,Greedy-교차로 (al,10,OK 41s,1,1
+step4,Greedy-전체교차로 (,10,OK 51s,0,0
+step4,GA-집합 (도로점),10,OK 52s,1,1
+step4,PPO,10,OK 42s,0,0
+step4,DQN,10,OK 42s,0,0
+step4,최적해(ILP),10,OK 41s,1,1
+fair,Greedy(f),5,OK 64s,2,1
+fair,GA(f),5,OK 34s,1,1
+fair,PPO(f),5,OK 64s,2,1
+fair,Greedy(f),8,SLOW(>300s),4,2
+fair,GA(f),8,SLOW(>300s),4,2
+fair,PPO(f),8,SLOW(>300s),6,2
+fair,Greedy(f),10,SLOW(>300s),6,2
+fair,GA(f),10,SLOW(>300s),4,3
+fair,PPO(f),10,SLOW(>300s),8,3
+algo7old,algo7,1,OK,0,0
+algo7old,algo7,2,OK,0,0
+algo7old,algo7,3,OK,0,0
+algo7old,algo7,4,OK,0,0
+algo7old,algo7,5,OK,0,0
+algo7old,algo7,6,K6:2126s K7:2883s(6M블록),2,2
+algo7old,algo7,7,K6:2126s K7:2883s(6M블록),2,2
+algo7old,algo7,8,?,4,2
+algo7old,algo7,9,?,5,2
+algo7old,algo7,10,?,5,2
+algo1old,algo1,5,OK 36s,0,0
+algo1old,algo1,8,OK 62s,1,1
+algo1old,algo1,10,OK 76s,2,1
+algo1old,algo1,15,불안정(제외),3,2
+algo1old,algo1,20,불안정(제외),5,2
+step3b,top,3,HANG,3,2
+step3b,top,2,OK 43s,1,1
