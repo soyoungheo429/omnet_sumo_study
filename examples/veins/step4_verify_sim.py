@@ -56,10 +56,33 @@ COL = {"algo1 (기존)": "#b9b8b2", "algo7 (기존)": "#8d8c86", "Greedy-교차�
        "최적해(ILP)": "#0b0b0b"}
 
 
+def migrate_raw(path):
+    """옛 버전(열 개수가 다른) 헤더로 시작된 raw CSV를 현재 COLS 형식으로 맞춘다. 이미 돌린 run은 그대로 보존."""
+    if not os.path.exists(path):
+        return
+    import csv
+    with open(path, encoding="utf-8") as f:
+        rows = list(csv.reader(f))
+    if not rows or rows[0] == COLS:
+        return
+    head = rows[0]
+    fixed = []
+    for r in rows[1:]:
+        if len(r) == len(COLS):          # 새 버전으로 쓴 줄
+            fixed.append(dict(zip(COLS, r)))
+        else:                            # 옛 헤더 기준 줄
+            fixed.append(dict(zip(head, r)))
+    with open(path, "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=COLS, restval="", extrasaction="ignore")
+        w.writeheader()
+        w.writerows(fixed)
+    print(f"[정리] {path}: 옛 형식 헤더를 새 형식({len(COLS)}열)으로 맞춤, {len(fixed)}줄 보존")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--methods", default=DEFAULT_METHODS)
-    ap.add_argument("--ks", default="1,2,3,5,8,10")
+    ap.add_argument("--ks", default="1,2,3,4,5,6,7,8,9,10")
     ap.add_argument("--repeats", type=int, default=1, help="step2에서 반복 편차가 매우 작아(≤0.13%p) 기본 1회")
     ap.add_argument("--timeout", type=int, default=300)
     ap.add_argument("--mock", action="store_true")
@@ -67,6 +90,7 @@ def main():
     ap.add_argument("--summarize-only", action="store_true")
     a = ap.parse_args()
     raw_path = os.path.join(OUT, "step4_verify_raw.csv")
+    migrate_raw(raw_path)
     P = pd.read_csv(os.path.join(OUT, "step4_placements.csv"), encoding="utf-8-sig")
     methods = [m.strip() for m in a.methods.split(",")]
     ks = [int(k) for k in a.ks.split(",")]
