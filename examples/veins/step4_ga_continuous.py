@@ -6,11 +6,11 @@ step4_ga_continuous.py   (시뮬레이션 0회, 빠른 평가 모델)
 지난주 GA(algo4 하이브리드)의 연산은 그대로 두고 "개체 = K개 연속 좌표 그룹"으로만 바꾼 다중 RSU GA
   개체    : {(x1,y1), …, (xK,yK)}  연속 좌표 (지도 범위 안 어디든)
   적합도  : 빠른 평가 모델의 커버(서비스 비율 근사)   ※ PDR은 RSU를 한 점에 몰수록 유리해져서 다중 RSU에 부적합
-  선택    : 상위 n_parent 그룹끼리 무작위로 짝지어 교배 + 엘리트 n_elite 그룹 유지
+  선택    : 토너먼트(무작위 3그룹 중 최고)로 부모 2개 + 엘리트 1그룹 유지        ← 지난주 algo4와 동일
   교배    : 부모 A, B의 RSU를 가장 가까운 것끼리 짝지음(헝가리안 매칭) → 짝마다 적합도 가중 평균
             child_i = (f_A·a_i + f_B·b_π(i)) / (f_A + f_B)
   돌연변이: 모든 좌표에 가우시안 노이즈 (Box-Muller: z = sqrt(−2 ln u1)·cos(2π u2))
-            σ_g = σ_max·(1 − g/G) + σ_min   → 세대가 지날수록 폭이 좁아짐
+            σ_g = σ_max − (σ_max − σ_min)·g/G,  σ_max=150m, σ_min=5m   ← 지난주 algo4와 동일
 출력: experiment_results/step4/step4_ga_cont_placements.csv (→ step4_verify_sim.py 로 실측)
       step4_ga_cont_history.csv (세대별 모든 그룹), step4_ga_cont_curve.png
 ================================================================
@@ -42,9 +42,9 @@ def box_muller(rng, n):
 
 
 class ContinuousGroupGA:
-    def __init__(self, S, K, pop=24, gens=40, n_parent=8, n_elite=2, sigma_max=300.0, sigma_min=15.0, seed=0, snap=5.0):
+    def __init__(self, S, K, pop=20, gens=30, n_elite=1, sigma_max=150.0, sigma_min=5.0, seed=0, snap=5.0):
         self.S, self.K, self.pop, self.gens = S, K, pop, gens
-        self.n_parent, self.n_elite = n_parent, n_elite
+        self.n_elite = n_elite
         self.sigma_max, self.sigma_min = sigma_max, sigma_min
         self.rng = np.random.default_rng(seed)
         self.lo = S.pts.min(0) - 50
@@ -67,7 +67,7 @@ class ContinuousGroupGA:
         return w * A[r] + (1 - w) * B[c]
 
     def mutate(self, X, g):
-        sigma = self.sigma_max * (1 - g / self.gens) + self.sigma_min
+        sigma = self.sigma_max - (self.sigma_max - self.sigma_min) * g / self.gens
         n = X.size
         return X + sigma * box_muller(self.rng, n).reshape(X.shape)
 
@@ -82,11 +82,11 @@ class ContinuousGroupGA:
             curve.append(F[order[0]])
             if g == self.gens:
                 break
-            parents = order[: self.n_parent]
             newP = [P[i] for i in order[: self.n_elite]]
             newF = [F[i] for i in order[: self.n_elite]]
             while len(newP) < self.pop:
-                a, b = self.rng.choice(parents, 2, replace=False)
+                a = max(self.rng.choice(self.pop, 3, replace=False), key=lambda i: F[i])   # 토너먼트
+                b = max(self.rng.choice(self.pop, 3, replace=False), key=lambda i: F[i])
                 child = self.clip(self.mutate(self.crossover(P[a], F[a], P[b], F[b]), g))
                 newP.append(child); newF.append(self.fit(child))
             P, F = newP, newF
@@ -97,8 +97,8 @@ class ContinuousGroupGA:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--ks", default="3,5,10")
-    ap.add_argument("--pop", type=int, default=24)
-    ap.add_argument("--gens", type=int, default=40)
+    ap.add_argument("--pop", type=int, default=20, help="지난주 algo4는 10")
+    ap.add_argument("--gens", type=int, default=30, help="지난주 algo4는 10")
     ap.add_argument("--runs", type=int, default=2)
     a = ap.parse_args()
     S = Surrogate("erlangen.poly.xml", "vehicle_snapshots_2s.csv")
