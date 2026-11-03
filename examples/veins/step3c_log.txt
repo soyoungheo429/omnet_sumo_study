@@ -1,0 +1,55 @@
+/home/veins/.local/lib/python3.9/site-packages/matplotlib/projections/__init__.py:63: UserWarning: Unable to import Axes3D. This may be due to multiple versions of Matplotlib being installed (e.g. as a system package and as a pip package). As a result, the 3D projection is not available.
+  warnings.warn("Unable to import Axes3D. This may be due to multiple versions of "
+GA: K=[2, 3, 5], 반복 2회, pop 8 x gens 6, 적합도 Service_Ratio  (run당 최대 약 38회 평가)
+  K=2 run0 gen1/6 best=20.76 (이번 세대 20.76) 평가 8회
+  K=2 run0 gen2/6 best=22.81 (이번 세대 22.81) 평가 14회
+  K=2 run0 gen3/6 best=29.36 (이번 세대 29.36) 평가 20회
+  K=2 run0 gen4/6 best=32.98 (이번 세대 32.98) 평가 24회
+  K=2 run0 gen5/6 best=38.39 (이번 세대 38.39) 평가 28회
+  K=2 run0 gen6/6 best=38.68 (이번 세대 38.68) 평가 33회
+== K=2 run0 완료: Service_Ratio=38.6774 평가 33회 1030s 좌표 [[760.5, 1332.6], [1226.0, 1462.0]]
+  K=2 run1 gen1/6 best=36.52 (이번 세대 36.52) 평가 8회
+  K=2 run1 gen2/6 best=36.52 (이번 세대 36.52) 평가 13회
+  K=2 run1 gen3/6 best=36.52 (이번 세대 36.52) 평가 17회
+  K=2 run1 gen4/6 best=36.52 (이번 세대 36.52) 평가 21회
+  K=2 run1 gen5/6 best=36.52 (이번 세대 36.52) 평가 23회
+  K=2 run1 gen6/6 best=36.52 (이번 세대 36.52) 평가 27회
+== K=2 run1 완료: Service_Ratio=36.5212 평가 27회 809s 좌표 [[1596.8, 453.3], [1304.0, 1373.9]]
+  K=3 run0 gen1/6 best=27.26 (이번 세대 27.26) 평가 8회
+  K=3 run0 gen2/6 best=32.99 (이번 세대 32.99) 평가 13회
+  K=3 run0 gen3/6 best=32.99 (이번 세대 32.99) 평가 19회
+  K=3 run0 gen4/6 best=34.24 (이번 세대 34.24) 평가 24회
+  K=3 run0 gen5/6 best=36.10 (이번 세대 36.10) 평가 30회
+  K=3 run0 gen6/6 best=38.48 (이번 세대 38.48) 평가 35회
+== K=3 run0 완료: Service_Ratio=38.4769 평가 35회 1169s 좌표 [[1260.5, 1332.3], [539.4, 1467.8], [2163.9, 1619.3]]
+  K=3 run1 gen1/6 best=36.16 (이번 세대 36.16) 평가 8회
+  K=3 run1 gen2/6 best=37.22 (이번 세대 37.22) 평가 14회
+  K=3 run1 gen3/6 best=42.91 (이번 세대 42.91) 평가 20회
+  K=3 run1 gen4/6 best=42.91 (이번 세대 42.91) 평가 26회
+  K=3 run1 gen5/6 best=42.91 (이번 세대 42.91) 평가 31회
+  K=3 run1 gen6/6 best=42.91 (이번 세대 42.91) 평가 35회
+== K=3 run1 완료: Service_Ratio=42.9083 평가 35회 3363s 좌표 [[1631.9, 1599.6], [1367.5, 1456.7], [1397.1, 1164.7]]
+  K=5 run0 gen1/6 best=41.21 (이번 세대 41.21) 평가 8회
+  K=5 run0 gen2/6 best=43.74 (이번 세대 43.74) 평가 14회
+  K=5 run0 gen3/6 best=43.74 (이번 세대 43.74) 평가 20회
+  K=5 run0 gen4/6 best=46.97 (이번 세대 46.97) 평가 26회
+  K=5 run0 gen5/6 best=51.23 (이번 세대 51.23) 평가 32회
+  K=5 run0 gen6/6 best=52.12 (이번 세대 52.12) 평가 37회
+== K=5 run0 완료: Service_Ratio=52.1201 평가 37회 999s 좌표 [[1361.7, 1377.8], [1529.5, 1166.9], [1455.1, 1559.0], [519.2, 1027.0], [1965.6, 1467.4]]
+  K=5 run1 gen1/6 best=32.37 (이번 세대 32.37) 평가 8회
+  K=5 run1 gen2/6 best=32.37 (이번 세대 32.37) 평가 14회
+  K=5 run1 gen3/6 best=32.37 (이번 세대 32.37) 평가 20회
+  K=5 run1 gen4/6 best=32.53 (이번 세대 32.53) 평가 26회
+  K=5 run1 gen5/6 best=32.53 (이번 세대 32.53) 평가 32회
+  K=5 run1 gen6/6 best=41.65 (이번 세대 41.65) 평가 38회
+== K=5 run1 완료: Service_Ratio=41.6513 평가 38회 1011s 좌표 [[792.6, 1291.4], [1295.1, 1601.0], [1004.0, 1440.8], [1067.6, 800.0], [1977.7, 1273.7]]
+    Algo  K    PDR  Service_Ratio  Total_Received  Jain_RSU   PER  RSSI_Mean_dBm
+GA_multi  2 21.620         37.599         40645.5     0.794 0.006        -79.505
+   algo1  2 22.924         44.550         43094.2     0.881 0.007        -76.605
+   algo7  2 19.232         36.910         36160.2     0.995 0.000        -75.934
+GA_multi  3 16.190         40.693         45657.0     0.673 0.000        -79.699
+   algo1  3 15.946         46.539         44966.0     0.638 0.003        -76.325
+   algo7  3 17.954         52.945         50631.6     0.984 0.000        -75.505
+GA_multi  5 11.600         46.886         54512.0     0.685 0.000        -80.286
+   algo1  5 13.150         63.025         61806.0     0.622 0.000        -76.506
+   algo7  5 17.650         70.351         82973.0     0.864 0.004        -75.925

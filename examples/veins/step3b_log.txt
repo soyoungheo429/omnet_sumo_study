@@ -1,0 +1,41 @@
+/home/veins/.local/lib/python3.9/site-packages/matplotlib/projections/__init__.py:63: UserWarning: Unable to import Axes3D. This may be due to multiple versions of Matplotlib being installed (e.g. as a system package and as a pip package). As a result, the 3D projection is not available.
+  warnings.warn("Unable to import Axes3D. This may be due to multiple versions of "
+총 9 run (repeats=1)
+  single   K=1: [(1292.47, 1361.22)]
+  top      K=2: [(1292.47, 1361.22), (1312.12, 1370.77)]
+  diverse  K=2: [(1292.47, 1361.22), (1558.75, 1613.94)]
+  top      K=3: [(1292.47, 1361.22), (1312.12, 1370.77), (1314.13, 1381.67)]
+  diverse  K=3: [(1292.47, 1361.22), (1558.75, 1613.94), (2249.71, 2253.85)]
+  top      K=4: [(1292.47, 1361.22), (1312.12, 1370.77), (1314.13, 1381.67), (1262.74, 1346.6)]
+  diverse  K=4: [(1292.47, 1361.22), (1558.75, 1613.94), (2249.71, 2253.85), (2631.46, 2264.85)]
+  top      K=5: [(1292.47, 1361.22), (1312.12, 1370.77), (1314.13, 1381.67), (1262.74, 1346.6), (1220.22, 1365.93)]
+  diverse  K=5: [(1292.47, 1361.22), (1558.75, 1613.94), (2249.71, 2253.85), (2631.46, 2264.85), (2061.45, 1056.77)]
+[4/9] top      K=3 rep0 PDR=0.00% Svc=nan% 300s ok=False
+[5/9] diverse  K=3 rep0 PDR=14.97% Svc=38.0% 7s ok=True
+[6/9] top      K=4 rep0 PDR=0.00% Svc=nan% 1240s ok=False
+[7/9] diverse  K=4 rep0 PDR=11.59% Svc=38.1% 16s ok=True
+/home/veins/.local/lib/python3.9/site-packages/matplotlib/projections/__init__.py:63: UserWarning: Unable to import Axes3D. This may be due to multiple versions of Matplotlib being installed (e.g. as a system package and as a pip package). As a result, the 3D projection is not available.
+  warnings.warn("Unable to import Axes3D. This may be due to multiple versions of "
+usage: step3b_ga_lastgen_combos.py [-h] [--csv CSV] [--out OUT] [--ks KS]
+                                   [--repeats REPEATS] [--min-sep MIN_SEP]
+                                   [--bitrate BITRATE] [--timeout TIMEOUT]
+                                   [--mock] [--dry-run]
+step3b_ga_lastgen_combos.py: error: unrecognized arguments: --max-top-k 2
+/home/veins/.local/lib/python3.9/site-packages/matplotlib/projections/__init__.py:63: UserWarning: Unable to import Axes3D. This may be due to multiple versions of Matplotlib being installed (e.g. as a system package and as a pip package). As a result, the 3D projection is not available.
+  warnings.warn("Unable to import Axes3D. This may be due to multiple versions of "
+총 6 run (repeats=1)
+  single   K=1: [(1292.47, 1361.22)]
+  top      K=2: [(1292.47, 1361.22), (1312.12, 1370.77)]
+  diverse  K=2: [(1292.47, 1361.22), (1558.75, 1613.94)]
+  diverse  K=3: [(1292.47, 1361.22), (1558.75, 1613.94), (2249.71, 2253.85)]
+  diverse  K=4: [(1292.47, 1361.22), (1558.75, 1613.94), (2249.71, 2253.85), (2631.46, 2264.85)]
+  diverse  K=5: [(1292.47, 1361.22), (1558.75, 1613.94), (2249.71, 2253.85), (2631.46, 2264.85), (2061.45, 1056.77)]
+[6/6] diverse  K=5 rep0 PDR=9.56% Svc=39.6% 25s ok=True
+   Mode  K   PDR  Service_Ratio  Total_Received  Jain_RSU   PER  Collisions  RSSI_Mean_dBm  N
+diverse  2 21.21         35.865         39883.0     0.780 0.000         0.0        -79.513  1
+diverse  3 14.97         37.980         42208.0     0.572 0.000         0.0        -79.753  1
+diverse  4 11.59         38.082         43589.0     0.456 0.000         0.0        -79.940  1
+diverse  5  9.56         39.585         44942.0     0.392 0.000         0.0        -79.921  1
+ single  1 32.49         33.840         30545.0     1.000 0.000         0.0        -77.888  1
+    top  2 28.34         30.498         53281.0     1.000 0.003         1.0        -78.603  1
+저장: experiment_results/step3
