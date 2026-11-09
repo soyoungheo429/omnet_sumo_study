@@ -41,9 +41,9 @@ MET = [("Service_Ratio", "서비스 비율(%)", 1), ("PDR", "PDR(%)", 1), ("Tota
        ("Jain_RSU", "Jain RSU", 1), ("Jain_Vehicle", "Jain 차량", 1), ("RSSI_Mean_dBm", "RSSI(dBm)", 1),
        ("PER", "PER(%)", -1), ("Collisions", "충돌 수", -1), ("Channel_Busy", "채널 점유율(%)", -1)]
 TIME = ("Time_s", "계산 시간(s)", -1)
-EN = {"Grid top-K": "Grid top-K", "Greedy-교차로": "Greedy-intersection", "Greedy-전체교차로": "Greedy-all junctions",
+EN = {"GA-연속그룹 (기존 연산)": "Continuous group-GA (old operators)", "Grid top-K": "Grid top-K", "Greedy-교차로": "Greedy-intersection", "Greedy-전체교차로": "Greedy-all junctions",
       "GA-집합 (도로점)": "Set-GA", "GA-연속그룹": "Continuous group-GA", "PPO": "PPO", "DQN": "DQN", "최적해(ILP)": "ILP (optimal)"}
-COL = {"Grid top-K": "#8d8c86", "Greedy-교차로": "#2a6fdb", "Greedy-전체교차로": "#1b998b", "GA-집합 (도로점)": "#eb6834",
+COL = {"GA-연속그룹 (기존 연산)": "#f3d27a", "Grid top-K": "#8d8c86", "Greedy-교차로": "#2a6fdb", "Greedy-전체교차로": "#1b998b", "GA-집합 (도로점)": "#eb6834",
        "GA-연속그룹": "#e3a008", "PPO": "#8e44ad", "DQN": "#c0392b", "최적해(ILP)": "#0b0b0b"}
 PAT = {"P1": "P1 random", "P2": "P2 downtown", "P3": "P3 arterial"}
 
@@ -208,8 +208,8 @@ def main():
             rb = raw[(raw.Pattern == p) & (raw.K == K)]
 
             def series(m):
-                g = rb[rb.Methods.str.split("|").apply(lambda L: m in L)]
-                return g.set_index("Seed").Service_Ratio
+                key = S[(S.Pattern == p) & (S.K == K) & (S.Method == m)].Key.iloc[0]
+                return rb[rb.Key == key].set_index("Seed").Service_Ratio
 
             sb = series(best)
             for m in c.Method:

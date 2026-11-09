@@ -9,7 +9,9 @@ step5_placements.py   (VM, 시뮬레이션 0회 — 패턴마다 커버리지 �
   Greedy-교차로        : algo1 수정 (교차로 111곳, 한계이득)
   Greedy-전체교차로    : algo7 수정 (교차점 195곳, 한계이득)
   GA-집합 (도로점)     : 개체 = K개 좌표 그룹, 도로 위 25m 간격 3,236곳
-  GA-연속그룹          : 개체 = K개 연속 좌표 그룹 (지난주 algo4와 같은 선택·엘리트·돌연변이)
+  GA-연속그룹          : 개체 = K개 연속 좌표 그룹, 후보·격자 없음. 지난주 algo4와 같은 토너먼트(3)·엘리트(1)·σ 150→5m,
+                         교차는 짝지은 RSU 단위 균등 교차, 돌연변이는 RSU 단위, 첫 세대는 차량 위치에서 (--cga-ops/--cga-init)
+  GA-연속그룹 (기존 연산): 이전 실행분(좌표 가중평균 교차 + 지도 전체 랜덤 초기화), --only-cga 때 이름만 바꿔 보존
   PPO / DQN            : 순차 배치 강화학습 (패턴마다 그 패턴 데이터로 따로 학습)
   최적해(ILP)          : 교차점 195곳 정수계획 (참고 상한)
 시간 기록 (timing.csv)
@@ -19,6 +21,7 @@ step5_placements.py   (VM, 시뮬레이션 0회 — 패턴마다 커버리지 �
 출력: experiment_results/step5/<패턴>/placements.csv, timing.csv,
       fig_pred_cover_and_time.png (예측 커버·K별 시간), map_K5.png / map_K10.png (방법별 배치 지도)
 실행: python3 -u step5_placements.py --patterns P1,P2,P3 2>&1 | tee step5_place_log.txt
+      연속 GA만 다시: python3 -u step5_placements.py --only-cga 2>&1 | tee step5_cga_log.txt
 ================================================================
 """
 import argparse
@@ -86,6 +89,8 @@ def run_pattern(p, a):
         sys.exit(f"{snap} 없음 → 먼저 python3 step5_snapshots.py")
     print(f"\n===== {p} =====")
     S = Surrogate("erlangen.poly.xml", snap)
+    if a.only_cga:
+        return rerun_cga(S, p, pdir, a)
     cms, secs = build(S, pdir, a.force_matrix)
     A, B, R, G = cms["A"], cms["B"], cms["R"], cms["G"]
     place, timing = [], []
@@ -117,17 +122,10 @@ def run_pattern(p, a):
         add("GA-집합 (도로점)", K, R.coords[best[0]], tick() - t)
         print(f"  Set-GA K={K}: {best[1]:.2f}%", flush=True)
     timing.append(dict(Method="GA-집합 (도로점)", Prep_s=secs["R"], Train_s=0))
-    # 5) 연속 그룹 GA
+    # 5) 연속 그룹 GA (격자·후보 없음, 개체 = K개 연속 좌표, 첫 세대는 차량 위치에서)
     if a.cga_ks:
-        from step4_ga_continuous import ContinuousGroupGA
-        for K in [int(k) for k in a.cga_ks.split(",")]:
-            t = tick(); best = None
-            for run in range(a.cga_runs):
-                X, f, _ = ContinuousGroupGA(S, K, pop=a.cga_pop, gens=a.cga_gens, seed=run).run()
-                if best is None or f > best[1]:
-                    best = (X, f)
-            add("GA-연속그룹", K, best[0], tick() - t)
-            print(f"  연속 GA K={K}: {best[1]:.2f}%  {tick() - t:.0f}s", flush=True)
+        for K, X, sec in cga(S, a):
+            add("GA-연속그룹", K, X, sec)
         timing.append(dict(Method="GA-연속그룹", Prep_s=0, Train_s=0))
     # 6,7) RL — 그 패턴의 앞 70% 시간대 30장 창 12개로 학습
     sn = S.snap.snapshot_no.to_numpy()
@@ -156,9 +154,44 @@ def run_pattern(p, a):
     except Exception as e:
         print("  (최적해 생략:", e, ")")
 
-    P = pd.DataFrame(place)
+    save(S, pd.DataFrame(place), pd.DataFrame(timing), p, pdir)
+
+
+def cga(S, a):
+    from step4_ga_continuous import ContinuousGroupGA
+    for K in [int(k) for k in a.cga_ks.split(",")]:
+        t = time.perf_counter(); best = None
+        for run in range(a.cga_runs):
+            X, f, _ = ContinuousGroupGA(S, K, pop=a.cga_pop, gens=a.cga_gens, seed=run, init=a.cga_init, ops=a.cga_ops).run()
+            if best is None or f > best[1]:
+                best = (X, f)
+        sec = time.perf_counter() - t
+        print(f"  연속 GA K={K}: {best[1]:.2f}%  {sec:.0f}s", flush=True)
+        yield K, best[0], sec
+
+
+def rerun_cga(S, p, pdir, a):
+    """연속 그룹 GA만 다시: 기존 결과는 'GA-연속그룹 (기존 연산)'로 이름만 바꿔 남김"""
+    P = pd.read_csv(os.path.join(pdir, "placements.csv"), encoding="utf-8-sig")
+    T = pd.read_csv(os.path.join(pdir, "timing.csv"), encoding="utf-8-sig")[["Method", "Prep_s", "Train_s"]]
+    old = "GA-연속그룹 (기존 연산)"
+    if old not in set(P.Method):
+        P.loc[P.Method == "GA-연속그룹", "Method"] = old
+        T.loc[T.Method == "GA-연속그룹", "Method"] = old
+    P = P[P.Method != "GA-연속그룹"]
+    T = T[T.Method != "GA-연속그룹"]
+    rows = []
+    for K, X, sec in cga(S, a):
+        c = [[round(float(x), 2), round(float(y), 2)] for x, y in X]
+        rows.append(dict(Pattern=p, Method="GA-연속그룹", K=K, Coords=json.dumps(c),
+                         Pred_Cover=round(S.cover_pct([tuple(q) for q in c]), 2), Time_K_s=round(sec, 4)))
+    P = pd.concat([P, pd.DataFrame(rows)], ignore_index=True)
+    T = pd.concat([T, pd.DataFrame([dict(Method="GA-연속그룹", Prep_s=0, Train_s=0)])], ignore_index=True)
+    save(S, P, T, p, pdir)
+
+
+def save(S, P, T, p, pdir):
     P.to_csv(os.path.join(pdir, "placements.csv"), index=False, encoding="utf-8-sig")
-    T = pd.DataFrame(timing)
     tk = P.pivot_table(index="Method", columns="K", values="Time_K_s")
     tk.columns = [f"K{k}_s" for k in tk.columns]
     T = T.merge(tk, left_on="Method", right_index=True, how="left")
@@ -170,9 +203,9 @@ def run_pattern(p, a):
     print(T[["Method", "Prep_s", "Train_s", "Sum_K_s", "Total_s"]].round(2).to_string(index=False))
 
 
-EN = {"Grid top-K": "Grid top-K", "Greedy-교차로": "Greedy-intersection", "Greedy-전체교차로": "Greedy-all junctions",
+EN = {"GA-연속그룹 (기존 연산)": "Continuous group-GA (old operators)", "Grid top-K": "Grid top-K", "Greedy-교차로": "Greedy-intersection", "Greedy-전체교차로": "Greedy-all junctions",
       "GA-집합 (도로점)": "Set-GA", "GA-연속그룹": "Continuous group-GA", "PPO": "PPO", "DQN": "DQN", "최적해(ILP)": "ILP (optimal)"}
-COL = {"Grid top-K": "#8d8c86", "Greedy-교차로": "#2a6fdb", "Greedy-전체교차로": "#1b998b", "GA-집합 (도로점)": "#eb6834",
+COL = {"GA-연속그룹 (기존 연산)": "#f3d27a", "Grid top-K": "#8d8c86", "Greedy-교차로": "#2a6fdb", "Greedy-전체교차로": "#1b998b", "GA-집합 (도로점)": "#eb6834",
        "GA-연속그룹": "#e3a008", "PPO": "#8e44ad", "DQN": "#c0392b", "최적해(ILP)": "#0b0b0b"}
 
 
@@ -220,8 +253,13 @@ def main():
     ap.add_argument("--patterns", default="P1,P2,P3")
     ap.add_argument("--force-matrix", action="store_true")
     ap.add_argument("--ga-runs", type=int, default=2)
-    ap.add_argument("--cga-ks", default="1,3,5,8,10", help="연속 GA 돌릴 K (빈 문자열이면 생략)")
-    ap.add_argument("--cga-runs", type=int, default=1)
+    ap.add_argument("--cga-ks", default="1,2,3,4,5,6,7,8,9,10", help="연속 GA 돌릴 K (빈 문자열이면 생략)")
+    ap.add_argument("--cga-init", default="vehicles", choices=["vehicles", "uniform"],
+                    help="첫 세대: vehicles=차량 위치에서 K개 / uniform=지도 전체 랜덤(지난주 algo4)")
+    ap.add_argument("--cga-ops", default="gene", choices=["gene", "avg"],
+                    help="gene=RSU 단위 균등 교차·돌연변이 / avg=좌표 가중평균 교차(지난주 algo4)")
+    ap.add_argument("--only-cga", action="store_true", help="연속 그룹 GA만 다시 돌려 기존 placements.csv에 반영")
+    ap.add_argument("--cga-runs", type=int, default=2, help="집합 GA와 같게 2회 중 최고")
     ap.add_argument("--cga-pop", type=int, default=20)
     ap.add_argument("--cga-gens", type=int, default=30)
     ap.add_argument("--ppo-iters", type=int, default=120)

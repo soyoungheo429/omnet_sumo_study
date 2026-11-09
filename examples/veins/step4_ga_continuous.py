@@ -42,7 +42,7 @@ def box_muller(rng, n):
 
 
 class ContinuousGroupGA:
-    def __init__(self, S, K, pop=20, gens=30, n_elite=1, sigma_max=150.0, sigma_min=5.0, seed=0, snap=5.0):
+    def __init__(self, S, K, pop=20, gens=30, n_elite=1, sigma_max=150.0, sigma_min=5.0, seed=0, snap=5.0, init="uniform", ops="avg"):
         self.S, self.K, self.pop, self.gens = S, K, pop, gens
         self.n_elite = n_elite
         self.sigma_max, self.sigma_min = sigma_max, sigma_min
@@ -51,6 +51,8 @@ class ContinuousGroupGA:
         self.hi = S.pts.max(0) + 50
         self.snap = snap                  # 좌표를 5m 단위로 반올림해 같은 위치 재계산 방지(연속 좌표 근사)
         self.history, self.n_evals = [], 0
+        self.ops = ops                    # avg: 짝지은 좌표 가중평균 + 전체 좌표 돌연변이(지난주 algo4) / gene: RSU 단위 균등 교차 + RSU 단위 돌연변이
+        self.init = init                  # uniform: 지도 전체 랜덤(지난주 algo4) / vehicles: 차량 스냅샷 위치에서 K개
 
     def clip(self, X):
         X = np.clip(X, self.lo, self.hi)
@@ -64,15 +66,24 @@ class ContinuousGroupGA:
         D = np.hypot(A[:, None, 0] - B[None, :, 0], A[:, None, 1] - B[None, :, 1])
         r, c = linear_sum_assignment(D)
         w = fa / (fa + fb) if fa + fb > 0 else 0.5
+        if self.ops == "gene":   # 짝지은 RSU마다 A 또는 B 것을 통째로 (적합도 높은 부모 쪽 확률 w)
+            pick = self.rng.random(self.K) < w
+            return np.where(pick[:, None], A[r], B[c])
         return w * A[r] + (1 - w) * B[c]
 
     def mutate(self, X, g):
         sigma = self.sigma_max - (self.sigma_max - self.sigma_min) * g / self.gens
         n = X.size
-        return X + sigma * box_muller(self.rng, n).reshape(X.shape)
+        step = sigma * box_muller(self.rng, n).reshape(X.shape)
+        if self.ops == "gene":   # RSU마다 확률 max(1/K, 0.2)로만 움직임
+            step *= (self.rng.random(self.K) < max(1.0 / self.K, 0.2))[:, None]
+        return X + step
 
     def run(self):
-        P = [self.clip(self.lo + self.rng.random((self.K, 2)) * (self.hi - self.lo)) for _ in range(self.pop)]
+        if self.init == "vehicles":
+            P = [self.clip(self.S.pts[self.rng.choice(len(self.S.pts), self.K, replace=False)]) for _ in range(self.pop)]
+        else:
+            P = [self.clip(self.lo + self.rng.random((self.K, 2)) * (self.hi - self.lo)) for _ in range(self.pop)]
         F = [self.fit(x) for x in P]
         curve = []
         for g in range(1, self.gens + 1):

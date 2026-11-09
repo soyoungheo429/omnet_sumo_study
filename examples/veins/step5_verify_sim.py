@@ -34,7 +34,7 @@ from rsu_lib import sim_eval  # noqa: E402
 
 OUT = os.path.join("experiment_results", "step5")
 RAW = os.path.join(OUT, "step5_verify_raw.csv")
-DEFAULT_METHODS = ("Grid top-K,Greedy-교차로,Greedy-전체교차로,GA-집합 (도로점),GA-연속그룹,PPO,DQN,최적해(ILP)")
+DEFAULT_METHODS = ("Grid top-K,Greedy-교차로,Greedy-전체교차로,GA-집합 (도로점),GA-연속그룹,GA-연속그룹 (기존 연산),PPO,DQN,최적해(ILP)")
 COLS = ["Key", "Pattern", "Methods", "K", "Rep", "Seed", "Coords", "Pred_Cover", "Success", "Elapsed_Sec", "PDR",
         "Service_Ratio", "Total_Received", "Jain_RSU", "Jain_Vehicle", "PER", "Collisions", "RSSI_Mean_dBm",
         "SNR_Mean_dB", "Channel_Busy", "RXTX_Lost", "Metrics_OK", "Error"]
@@ -56,19 +56,31 @@ def make_eval(p, timeout):
     return ev
 
 
-def summarize():
+def place_key(p, K, coords):
+    return f"{p}|K{K}|" + json.dumps(sorted([[round(x, 1), round(y, 1)] for x, y in coords]))
+
+
+def summarize(pats):
+    """방법 이름은 현재 placements.csv 기준으로 붙임 (다시 돌린 방법의 옛 결과가 섞이지 않게)"""
     raw = pd.read_csv(RAW)
     raw = raw[raw.Success.astype(str) == "True"]
+    owners = {}
+    for p in pats:
+        P = pd.read_csv(os.path.join(OUT, p, "placements.csv"), encoding="utf-8-sig")
+        for r in P.itertuples():
+            owners.setdefault(place_key(p, int(r.K), json.loads(r.Coords)), []).append(r.Method)
     rows = []
     for key, g in raw.groupby("Key"):
-        base = dict(Pattern=g.Pattern.iloc[0], K=int(g.K.iloc[0]), Pred_Cover=g.Pred_Cover.iloc[0], n=len(g))
+        if key not in owners:
+            continue
+        base = dict(Key=key, Pattern=g.Pattern.iloc[0], K=int(g.K.iloc[0]), Pred_Cover=g.Pred_Cover.iloc[0], n=len(g))
         stats = {}
         for m in METRICS:
             v = g[m].astype(float).to_numpy()
             sd = float(np.std(v, ddof=1)) if len(v) > 1 else 0.0
             stats.update({f"{m}_mean": v.mean(), f"{m}_std": sd,
                           f"{m}_ci95": T95.get(len(v) - 1, 1.96) * sd / math.sqrt(len(v)) if len(v) > 1 else 0.0})
-        for m in g.Methods.iloc[0].split("|"):
+        for m in owners[key]:
             rows.append(dict(base, Method=m, **stats))
     S = pd.DataFrame(rows).sort_values(["Pattern", "K", "Method"])
     S.to_csv(os.path.join(OUT, "step5_verify_summary.csv"), index=False, encoding="utf-8-sig")
@@ -101,7 +113,7 @@ def main():
                 if r.empty:
                     continue
                 c = json.loads(r.Coords.iloc[0])
-                key = f"{p}|K{K}|" + json.dumps(sorted([[round(x, 1), round(y, 1)] for x, y in c]))
+                key = place_key(p, K, c)
                 jobs.setdefault(key, dict(Pattern=p, K=K, Coords=c, Methods=[], Pred=float(r.Pred_Cover.iloc[0])))["Methods"].append(m)
     order = sorted(jobs, key=lambda k: (pats.index(jobs[k]["Pattern"]), jobs[k]["K"]))
     runs = [(k, rep) for rep in range(a.repeats) for k in order]
@@ -141,7 +153,7 @@ def main():
                   f"PDR {res['PDR']:.2f}% {res['Elapsed_Sec']:.0f}s ok={res['Success']}  남은 ~{eta:.1f}h  ({j['Methods'][0]} 외 {len(j['Methods']) - 1})",
                   flush=True)
     if os.path.exists(RAW):
-        summarize()
+        summarize(pats)
 
 
 if __name__ == "__main__":
