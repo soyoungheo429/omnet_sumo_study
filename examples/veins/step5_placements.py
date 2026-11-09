@@ -16,7 +16,8 @@ step5_placements.py   (VM, 시뮬레이션 0회 — 패턴마다 커버리지 �
   Prep_s   : 방법이 K와 상관없이 한 번 하는 준비 (후보지 커버리지 행렬 / 격자 점수 계산)
   Train_s  : 강화학습 학습 시간 (따로 표기)
   Time_K_s : 그 K 하나를 푸는 데 걸린 시간 (Greedy도 K마다 처음부터 다시 풀어서 잼)
-출력: experiment_results/step5/<패턴>/placements.csv, timing.csv
+출력: experiment_results/step5/<패턴>/placements.csv, timing.csv,
+      fig_pred_cover_and_time.png (예측 커버·K별 시간), map_K5.png / map_K10.png (방법별 배치 지도)
 실행: python3 -u step5_placements.py --patterns P1,P2,P3 2>&1 | tee step5_place_log.txt
 ================================================================
 """
@@ -26,8 +27,12 @@ import os
 import sys
 import time
 
-import numpy as np
-import pandas as pd
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt  # noqa: E402
+import numpy as np  # noqa: E402
+import pandas as pd  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 os.chdir(HERE)
@@ -160,8 +165,54 @@ def run_pattern(p, a):
     T["Sum_K_s"] = tk.sum(axis=1).reindex(T.Method).to_numpy()
     T["Total_s"] = T.Prep_s + T.Train_s + T.Sum_K_s
     T.round(4).to_csv(os.path.join(pdir, "timing.csv"), index=False, encoding="utf-8-sig")
+    figures(S, P, T, p, pdir)
     print(P.pivot_table(index="K", columns="Method", values="Pred_Cover").round(1).to_string())
     print(T[["Method", "Prep_s", "Train_s", "Sum_K_s", "Total_s"]].round(2).to_string(index=False))
+
+
+EN = {"Grid top-K": "Grid top-K", "Greedy-교차로": "Greedy-intersection", "Greedy-전체교차로": "Greedy-all junctions",
+      "GA-집합 (도로점)": "Set-GA", "GA-연속그룹": "Continuous group-GA", "PPO": "PPO", "DQN": "DQN", "최적해(ILP)": "ILP (optimal)"}
+COL = {"Grid top-K": "#8d8c86", "Greedy-교차로": "#2a6fdb", "Greedy-전체교차로": "#1b998b", "GA-집합 (도로점)": "#eb6834",
+       "GA-연속그룹": "#e3a008", "PPO": "#8e44ad", "DQN": "#c0392b", "최적해(ILP)": "#0b0b0b"}
+
+
+def figures(S, P, T, p, pdir):
+    """예측 커버 곡선, K별 계산 시간, K=5/10 배치 지도 (방법별)"""
+    ms = [m for m in EN if m in set(P.Method)]
+    fig, axes = plt.subplots(1, 2, figsize=(13, 4.4))
+    for m in ms:
+        s = P[P.Method == m].sort_values("K")
+        axes[0].plot(s.K, s.Pred_Cover, marker="o", ms=3.5, lw=1.6, color=COL[m], label=EN[m],
+                     ls=":" if m == "최적해(ILP)" else "-")
+        axes[1].plot(s.K, s.Time_K_s.clip(lower=1e-5), marker="o", ms=3.5, lw=1.6, color=COL[m], label=EN[m])
+    axes[0].set_ylabel("Predicted coverage ≈ service ratio (%)"); axes[0].set_title(f"{p}: coverage by method", loc="left", fontsize=11)
+    axes[1].set_yscale("log"); axes[1].set_ylabel("Time to solve one K (s, log)")
+    axes[1].set_title(f"{p}: computation time per K (RL training excluded)", loc="left", fontsize=11)
+    for ax in axes:
+        ax.set_xlabel("K"); ax.grid(color="#e6e5e0")
+    axes[0].legend(frameon=False, fontsize=8)
+    plt.tight_layout(); plt.savefig(os.path.join(pdir, "fig_pred_cover_and_time.png"), dpi=150); plt.close()
+    for K in (5, 10):
+        sub = [m for m in ms if not P[(P.Method == m) & (P.K == K)].empty]
+        nc = 4
+        nr = int(np.ceil(len(sub) / nc))
+        fig, axes = plt.subplots(nr, nc, figsize=(4.2 * nc, 4.6 * nr), sharex=True, sharey=True)
+        axes = np.atleast_1d(axes).ravel()
+        for ax, m in zip(axes, sub):
+            row = P[(P.Method == m) & (P.K == K)].iloc[0]
+            c = np.array(json.loads(row.Coords))
+            cov = np.zeros(len(S.pts), bool)
+            for q in c:
+                cov |= S.covered(tuple(q))
+            ax.scatter(S.pts[~cov, 0], S.pts[~cov, 1], s=1.5, color="#d8d7d2")
+            ax.scatter(S.pts[cov, 0], S.pts[cov, 1], s=1.5, color="#9cc3f0")
+            ax.scatter(c[:, 0], c[:, 1], s=60, marker="X", color=COL[m], edgecolor="#0b0b0b", lw=0.6, zorder=5)
+            ax.set_title(f"{EN[m]}: {row.Pred_Cover:.1f}%", fontsize=9, loc="left")
+            ax.set_xlim(0, 2660); ax.set_ylim(3060, 0); ax.set_aspect("equal"); ax.set_xticks([]); ax.set_yticks([])
+        for ax in axes[len(sub):]:
+            ax.axis("off")
+        fig.suptitle(f"{p}, K={K} placements (blue = vehicle positions covered, grey = not covered)", x=0.01, ha="left", fontsize=10)
+        plt.tight_layout(); plt.savefig(os.path.join(pdir, f"map_K{K}.png"), dpi=140); plt.close()
 
 
 def main():
