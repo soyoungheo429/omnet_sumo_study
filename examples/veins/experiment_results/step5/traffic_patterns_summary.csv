@@ -1,0 +1,4 @@
+﻿Pattern,Route_file,Vehicles,Route_km_mean,Downtown600m_share,Arterial_share
+P1,erlangen.rou.xml,47,37.62,49.7,36.1
+P2,erlangen_P2.rou.xml,47,6.67,80.7,18.7
+P3,erlangen_P3.rou.xml,47,7.87,27.7,73.0

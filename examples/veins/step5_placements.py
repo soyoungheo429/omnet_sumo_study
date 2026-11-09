@@ -1,0 +1,186 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+step5_placements.py   (VM, 시뮬레이션 0회 — 패턴마다 커버리지 행렬 처음 1회 수 분, 이후 캐시)
+================================================================
+교통 패턴(P1/P2/P3)별로 모든 방법의 RSU 배치를 만들고, 방법×K 계산 시간을 잰다.
+방법 (8개)
+  Grid top-K           : 150m 격자 340곳 각각 단독 커버 계산 → 점수 높은 순 K개 (다중 RSU 격자 비교군)
+  Greedy-교차로        : algo1 수정 (교차로 111곳, 한계이득)
+  Greedy-전체교차로    : algo7 수정 (교차점 195곳, 한계이득)
+  GA-집합 (도로점)     : 개체 = K개 좌표 그룹, 도로 위 25m 간격 3,236곳
+  GA-연속그룹          : 개체 = K개 연속 좌표 그룹 (지난주 algo4와 같은 선택·엘리트·돌연변이)
+  PPO / DQN            : 순차 배치 강화학습 (패턴마다 그 패턴 데이터로 따로 학습)
+  최적해(ILP)          : 교차점 195곳 정수계획 (참고 상한)
+시간 기록 (timing.csv)
+  Prep_s   : 방법이 K와 상관없이 한 번 하는 준비 (후보지 커버리지 행렬 / 격자 점수 계산)
+  Train_s  : 강화학습 학습 시간 (따로 표기)
+  Time_K_s : 그 K 하나를 푸는 데 걸린 시간 (Greedy도 K마다 처음부터 다시 풀어서 잼)
+출력: experiment_results/step5/<패턴>/placements.csv, timing.csv
+실행: python3 -u step5_placements.py --patterns P1,P2,P3 2>&1 | tee step5_place_log.txt
+================================================================
+"""
+import argparse
+import json
+import os
+import sys
+import time
+
+import numpy as np
+import pandas as pd
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+os.chdir(HERE)
+sys.path.insert(0, HERE)
+from rsu_lib.surrogate import Surrogate  # noqa: E402
+from rsu_lib import candidates as CA  # noqa: E402
+from rsu_lib.placement import CoverageMatrix, greedy_marginal, SetGA  # noqa: E402
+from rsu_lib.rl import PPOAgent, DQNAgent  # noqa: E402
+
+OUT = os.path.join("experiment_results", "step5")
+KS = list(range(1, 11))
+
+
+def cm_from(coords, M, ids=None):
+    cm = object.__new__(CoverageMatrix)
+    cm.coords, cm.M = np.asarray(coords, float), M
+    cm.ids = ids or [f"c{i}" for i in range(len(coords))]
+    cm.n_pts, cm.w = M.shape[1], np.ones(M.shape[1])
+    cm.single = M.mean(1) * 100
+    return cm
+
+
+def build(S, pdir, force=False):
+    cand = {"A": [(x, y) for _, x, y in CA.intersections("erlangen.net.xml")],
+            "B": [(x, y) for _, x, y in CA.all_junctions("erlangen.net.xml")],
+            "R": [tuple(p) for p in CA.road_points("erlangen.net.xml", 25)]}
+    g = pd.read_csv("bruteforce_grid_150n_corrected.csv", encoding="utf-8-sig")
+    cand["G"] = list(zip(g.Sim_X, g.Sim_Y))
+    cache = os.path.join(pdir, "_coverage_cache.npz")
+    if os.path.exists(cache) and not force:
+        z = np.load(cache)
+        mats = {k: np.unpackbits(z[k], axis=1)[:, : len(S.pts)].astype(bool) for k in cand}
+        secs = json.loads(str(z["secs"]))
+        print("  커버리지 행렬: 캐시 사용", {k: f"{v:.0f}s" for k, v in secs.items()})
+    else:
+        mats, secs = {}, {}
+        for k, pts in cand.items():
+            t = time.time()
+            mats[k] = np.vstack([S.covered(p) for p in pts])
+            secs[k] = time.time() - t
+            print(f"  커버리지 행렬 {k}: {len(pts)}곳 {secs[k]:.0f}s", flush=True)
+        np.savez_compressed(cache, secs=json.dumps(secs), **{k: np.packbits(v, axis=1) for k, v in mats.items()})
+    return {k: cm_from(cand[k], mats[k]) for k in cand}, secs
+
+
+def run_pattern(p, a):
+    pdir = os.path.join(OUT, p)
+    os.makedirs(pdir, exist_ok=True)
+    snap = f"vehicle_snapshots_2s_{p}.csv"
+    if not os.path.exists(snap):
+        sys.exit(f"{snap} 없음 → 먼저 python3 step5_snapshots.py")
+    print(f"\n===== {p} =====")
+    S = Surrogate("erlangen.poly.xml", snap)
+    cms, secs = build(S, pdir, a.force_matrix)
+    A, B, R, G = cms["A"], cms["B"], cms["R"], cms["G"]
+    place, timing = [], []
+
+    def add(m, K, coords, t):
+        coords = [[round(float(x), 2), round(float(y), 2)] for x, y in coords]
+        place.append(dict(Pattern=p, Method=m, K=K, Coords=json.dumps(coords),
+                          Pred_Cover=round(S.cover_pct([tuple(c) for c in coords]), 2), Time_K_s=round(t, 4)))
+
+    def tick():
+        return time.perf_counter()
+
+    # 1) Grid top-K
+    for K in KS:
+        t = tick(); sel = list(np.argsort(-G.single, kind="stable")[:K]); add("Grid top-K", K, G.coords[sel], tick() - t)
+    timing.append(dict(Method="Grid top-K", Prep_s=secs["G"], Train_s=0))
+    # 2,3) Greedy
+    for cm, lab, key in ((A, "Greedy-교차로", "A"), (B, "Greedy-전체교차로", "B")):
+        for K in KS:
+            t = tick(); sel = greedy_marginal(cm, K)[0]; add(lab, K, cm.coords[sel], tick() - t)
+        timing.append(dict(Method=lab, Prep_s=secs[key], Train_s=0))
+    # 4) 집합 GA
+    for K in KS:
+        t = tick(); best = None
+        for run in range(a.ga_runs):
+            ind, f, _ = SetGA(R, K, pop=40, gens=60, seed=run).run()
+            if best is None or f > best[1]:
+                best = (ind, f)
+        add("GA-집합 (도로점)", K, R.coords[best[0]], tick() - t)
+        print(f"  Set-GA K={K}: {best[1]:.2f}%", flush=True)
+    timing.append(dict(Method="GA-집합 (도로점)", Prep_s=secs["R"], Train_s=0))
+    # 5) 연속 그룹 GA
+    if a.cga_ks:
+        from step4_ga_continuous import ContinuousGroupGA
+        for K in [int(k) for k in a.cga_ks.split(",")]:
+            t = tick(); best = None
+            for run in range(a.cga_runs):
+                X, f, _ = ContinuousGroupGA(S, K, pop=a.cga_pop, gens=a.cga_gens, seed=run).run()
+                if best is None or f > best[1]:
+                    best = (X, f)
+            add("GA-연속그룹", K, best[0], tick() - t)
+            print(f"  연속 GA K={K}: {best[1]:.2f}%  {tick() - t:.0f}s", flush=True)
+        timing.append(dict(Method="GA-연속그룹", Prep_s=0, Train_s=0))
+    # 6,7) RL — 그 패턴의 앞 70% 시간대 30장 창 12개로 학습
+    sn = S.snap.snapshot_no.to_numpy()
+    cut = np.quantile(sn, 0.7)
+    rng = np.random.default_rng(0)
+    train = []
+    for _ in range(12):
+        s0 = rng.integers(sn.min(), cut - 30)
+        train.append(B.subset_points((sn >= s0) & (sn < s0 + 30)))
+    for lab, Ag, kw in (("PPO", PPOAgent, dict(iters=a.ppo_iters, episodes=8, log_every=0)),
+                        ("DQN", DQNAgent, dict(episodes=a.dqn_eps, log_every=0))):
+        ag = Ag(seed=0)
+        t = tick(); ag.train(train, **kw); tr = tick() - t
+        print(f"  {lab} 학습 {tr:.1f}s", flush=True)
+        for K in KS:
+            t = tick()
+            sel = ag.run_episode(B, K, greedy=True)[0] if lab == "PPO" else ag.run_episode(B, K)[0]
+            add(lab, K, B.coords[sel], tick() - t)
+        timing.append(dict(Method=lab, Prep_s=secs["B"], Train_s=tr))
+    # 8) 최적해
+    try:
+        from rsu_lib.optimal import max_cover_optimal
+        for K in KS:
+            t = tick(); sel = max_cover_optimal(B, K, 60)[0]; add("최적해(ILP)", K, B.coords[sel], tick() - t)
+        timing.append(dict(Method="최적해(ILP)", Prep_s=secs["B"], Train_s=0))
+    except Exception as e:
+        print("  (최적해 생략:", e, ")")
+
+    P = pd.DataFrame(place)
+    P.to_csv(os.path.join(pdir, "placements.csv"), index=False, encoding="utf-8-sig")
+    T = pd.DataFrame(timing)
+    tk = P.pivot_table(index="Method", columns="K", values="Time_K_s")
+    tk.columns = [f"K{k}_s" for k in tk.columns]
+    T = T.merge(tk, left_on="Method", right_index=True, how="left")
+    T["Sum_K_s"] = tk.sum(axis=1).reindex(T.Method).to_numpy()
+    T["Total_s"] = T.Prep_s + T.Train_s + T.Sum_K_s
+    T.round(4).to_csv(os.path.join(pdir, "timing.csv"), index=False, encoding="utf-8-sig")
+    print(P.pivot_table(index="K", columns="Method", values="Pred_Cover").round(1).to_string())
+    print(T[["Method", "Prep_s", "Train_s", "Sum_K_s", "Total_s"]].round(2).to_string(index=False))
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--patterns", default="P1,P2,P3")
+    ap.add_argument("--force-matrix", action="store_true")
+    ap.add_argument("--ga-runs", type=int, default=2)
+    ap.add_argument("--cga-ks", default="1,3,5,8,10", help="연속 GA 돌릴 K (빈 문자열이면 생략)")
+    ap.add_argument("--cga-runs", type=int, default=1)
+    ap.add_argument("--cga-pop", type=int, default=20)
+    ap.add_argument("--cga-gens", type=int, default=30)
+    ap.add_argument("--ppo-iters", type=int, default=120)
+    ap.add_argument("--dqn-eps", type=int, default=1200)
+    a = ap.parse_args()
+    t0 = time.time()
+    for p in a.patterns.split(","):
+        run_pattern(p, a)
+    print(f"\n완료 {time.time() - t0:.0f}s → {OUT}/<패턴>/placements.csv  다음: step5_verify_sim.py")
+
+
+if __name__ == "__main__":
+    main()

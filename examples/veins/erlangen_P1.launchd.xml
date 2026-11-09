@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<!-- step5 traffic pattern P1 -->
+<launch>
+    <copy file="erlangen.net.xml" />
+    <copy file="erlangen.rou.xml" />
+    <copy file="erlangen.poly.xml" />
+    <copy file="erlangen_P1.sumo.cfg" type="config" />
+</launch>
