@@ -70,10 +70,10 @@ def grid_points(net, R, step=150.0, near=100.0):
     return [tuple(p) for p in G[keep]]
 
 
-def build(S, pdir, F, force=False):
+def build(S, pdir, F, force=False, road_step=25.0):
     cand = {"A": [(x, y) for _, x, y in CA.intersections(F["net"])],
             "B": [(x, y) for _, x, y in CA.all_junctions(F["net"])],
-            "R": [tuple(p) for p in CA.road_points(F["net"], 25)]}
+            "R": [tuple(p) for p in CA.road_points(F["net"], road_step)]}
     if F["grid"]:
         g = pd.read_csv(F["grid"], encoding="utf-8-sig")
         cand["G"] = list(zip(g.Sim_X, g.Sim_Y))
@@ -107,7 +107,7 @@ def run_pattern(p, a):
     S = Surrogate(F["poly"], snap)
     if a.only_cga:
         return rerun_cga(S, p, pdir, a)
-    cms, secs = build(S, pdir, F, a.force_matrix)
+    cms, secs = build(S, pdir, F, a.force_matrix, a.road_step)
     A, B, R, G = cms["A"], cms["B"], cms["R"], cms["G"]
     place, timing = [], []
 
@@ -270,6 +270,7 @@ def main():
     ap.add_argument("--patterns", default="P1,P2,P3")
     ap.add_argument("--force-matrix", action="store_true")
     ap.add_argument("--ga-runs", type=int, default=2)
+    ap.add_argument("--road-step", type=float, default=25.0, help="집합 GA 도로 위 후보점 간격(m). 큰 지도는 50")
     ap.add_argument("--cga-ks", default="1,2,3,4,5,6,7,8,9,10", help="연속 GA 돌릴 K (빈 문자열이면 생략)")
     ap.add_argument("--cga-init", default="vehicles", choices=["vehicles", "uniform"],
                     help="첫 세대: vehicles=차량 위치에서 K개 / uniform=지도 전체 랜덤(지난주 algo4)")
