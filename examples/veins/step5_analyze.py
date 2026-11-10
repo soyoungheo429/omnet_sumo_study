@@ -45,7 +45,8 @@ EN = {"GA-연속그룹 (기존 연산)": "Continuous group-GA (old operators)", 
       "GA-집합 (도로점)": "Set-GA", "GA-연속그룹": "Continuous group-GA", "PPO": "PPO", "DQN": "DQN", "최적해(ILP)": "ILP (optimal)"}
 COL = {"GA-연속그룹 (기존 연산)": "#f3d27a", "Grid top-K": "#8d8c86", "Greedy-교차로": "#2a6fdb", "Greedy-전체교차로": "#1b998b", "GA-집합 (도로점)": "#eb6834",
        "GA-연속그룹": "#e3a008", "PPO": "#8e44ad", "DQN": "#c0392b", "최적해(ILP)": "#0b0b0b"}
-PAT = {"P1": "P1 random", "P2": "P2 downtown", "P3": "P3 arterial"}
+PAT = {"P1": "Erlangen P1 random", "P2": "Erlangen P2 downtown", "P3": "Erlangen P3 arterial",
+       "DA_P1": "Darmstadt P1 random", "DA_P2": "Darmstadt P2 downtown", "DA_P3": "Darmstadt P3 arterial"}
 
 
 def md(df, path):
@@ -134,6 +135,10 @@ def main():
     O = C.groupby("Method").agg(Scenarios=("K", "size"), 평균순위_전체지표=("Rank_Score_all", "mean"),
                                 평균순위_시간제외=("Rank_Score_noTime", "mean"), 평균순위_TOPSIS=("Rank_TOPSIS", "mean"),
                                 종합점수_평균=("Score_all", "mean"), 종합점수_표준편차=("Score_all", "std"))
+    C["Map"] = np.where(C.Pattern.str.startswith("DA_"), "Darmstadt", "Erlangen")
+    if C.Map.nunique() > 1:
+        for mp in ("Erlangen", "Darmstadt"):
+            O[f"평균순위_{mp}"] = C[C.Map == mp].groupby("Method").Rank_Score_all.mean()
     for p in pats:
         O[f"평균순위_{p}"] = C[C.Pattern == p].groupby("Method").Rank_Score_all.mean()
     O = O.sort_values("평균순위_전체지표").round(3).reset_index()
@@ -231,8 +236,11 @@ def main():
     pd.DataFrame(sig).round(4).to_csv(os.path.join(AN, "significance.csv"), index=False, encoding="utf-8-sig")
 
     # 6) 그래프: 패턴별 서비스 비율
-    fig, axes = plt.subplots(1, len(pats), figsize=(5.2 * len(pats), 4.2), sharey=True)
-    axes = np.atleast_1d(axes)
+    nc = min(3, len(pats)); nr = int(np.ceil(len(pats) / nc))
+    fig, axes = plt.subplots(nr, nc, figsize=(5.2 * nc, 4.2 * nr), sharey=True, squeeze=False)
+    axes = axes.ravel()
+    for ax in axes[len(pats):]:
+        ax.axis("off")
     for ax, p in zip(axes, pats):
         for m in methods:
             s = S[(S.Pattern == p) & (S.Method == m)].sort_values("K")
@@ -241,7 +249,9 @@ def main():
         n = int(S[S.Pattern == p].n.min())
         ax.set_title(f"{PAT.get(p, p)}  (n={n} runs each)", loc="left", fontsize=10)
         ax.set_xlabel("K"); ax.grid(color="#e6e5e0")
-    axes[0].set_ylabel("Service ratio (%)  mean ± std"); axes[0].legend(frameon=False, fontsize=7.5)
+    for ax in axes[::nc]:
+        ax.set_ylabel("Service ratio (%)  mean ± std")
+    axes[0].legend(frameon=False, fontsize=7.5)
     plt.tight_layout(); plt.savefig(os.path.join(AN, "fig_service_by_pattern.png"), dpi=150); plt.close()
     for p in pats:
         fig, axs = plt.subplots(3, 3, figsize=(15, 11))

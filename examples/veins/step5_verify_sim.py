@@ -4,7 +4,7 @@
 step5_verify_sim.py   (VM에서 실제 OMNeT++/Veins 시뮬레이션, 반복 R회)
 ================================================================
 step5_placements.py 의 배치를 교통 패턴별로 실제 시뮬레이션 R회(기본 5) 돌려 평균·표준편차를 낸다.
-  - 패턴마다 다른 SUMO 교통: erlangen_P*.launchd.xml 로 바꿔 끼움 (P1 = 기존 교통)
+  - 시나리오마다 다른 지도·교통: <지도>_P*.launchd.xml 로 바꿔 끼움 (Erlangen P1..P3 / Darmstadt DA_P1..DA_P3)
   - 같은 좌표 집합은 한 번만 (K가 작을 때 Greedy/PPO/DQN/ILP가 같은 배치인 경우)
   - 반복 r의 seed = 9000 + r  → 모든 방법이 같은 seed 세트로 비교됨 (짝지은 비교/검정 가능)
   - 순서: 반복 0을 모든 패턴·K·방법에 대해 먼저 → 반복 1 → ...  (중간에 멈춰도 반복 수만 적은 완결 결과)
@@ -13,6 +13,7 @@ step5_placements.py 의 배치를 교통 패턴별로 실제 시뮬레이션 R�
   step5_verify_raw.csv      run 1개 = 1행 (패턴, K, 반복, seed, 모든 지표, 시뮬 시간)
   step5_verify_summary.csv  패턴×방법×K: 지표별 n / 평균 / 표준편차 / 95% 신뢰구간
 실행:  python3 -u step5_verify_sim.py --timeout 600 2>&1 | tee step5_log.txt
+       Darmstadt: python3 -u step5_verify_sim.py --patterns DA_P1,DA_P2,DA_P3 --ks 1,2,3,4,5,6,7,8,9,10 --timeout 600
        예정만 보기: --dry-run   /  요약만: --summarize-only   /  테스트: --mock
 ================================================================
 """
@@ -31,6 +32,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 os.chdir(HERE)
 sys.path.insert(0, HERE)
 from rsu_lib import sim_eval  # noqa: E402
+from rsu_lib import scenario as SC  # noqa: E402
 
 OUT = os.path.join("experiment_results", "step5")
 RAW = os.path.join(OUT, "step5_verify_raw.csv")
@@ -44,11 +46,11 @@ T95 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8:
 
 
 def make_eval(p, timeout):
-    """패턴별 템플릿: launchConfig 줄만 erlangen_P*.launchd.xml 로 교체"""
+    """시나리오별 템플릿: launchConfig 줄만 <지도>_P*.launchd.xml 로 교체"""
     d = os.path.join(OUT, p)
     ev = sim_eval.SimEvaluator(d, "6Mbps", True, timeout)
     txt = open(ev.template, encoding="utf-8").read()
-    txt, n = re.subn(r'^\*\.manager\.launchConfig\s*=.*$', f'*.manager.launchConfig = xmldoc("erlangen_{p}.launchd.xml")  # [step5]',
+    txt, n = re.subn(r'^\*\.manager\.launchConfig\s*=.*$', f'*.manager.launchConfig = xmldoc("{SC.files(p)["launchd"]}")  # [step5]',
                      txt, flags=re.M)
     if n != 1:
         sys.exit("템플릿에서 launchConfig 줄을 찾지 못함")
@@ -152,8 +154,9 @@ def main():
             print(f"[{i}/{len(todo)}] rep{rep} {j['Pattern']} K={j['K']:2d} 예측 {j['Pred']:5.1f}% → 서비스 {res['Service_Ratio']:.1f}% "
                   f"PDR {res['PDR']:.2f}% {res['Elapsed_Sec']:.0f}s ok={res['Success']}  남은 ~{eta:.1f}h  ({j['Methods'][0]} 외 {len(j['Methods']) - 1})",
                   flush=True)
-    if os.path.exists(RAW):
-        summarize(pats)
+    if os.path.exists(RAW):   # 요약은 배치가 있는 모든 시나리오 (Erlangen + Darmstadt 함께)
+        allp = sorted(d for d in os.listdir(OUT) if os.path.exists(os.path.join(OUT, d, "placements.csv")))
+        summarize(allp)
 
 
 if __name__ == "__main__":

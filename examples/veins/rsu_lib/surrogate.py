@@ -43,6 +43,14 @@ def utm_to_sim(x, y):
     return x - OFFSET_X + MARGIN, HEIGHT - (y - OFFSET_Y) + MARGIN
 
 
+def set_map(net_xml):
+    """다른 지도: net.xml 의 convBoundary(xmin, ymin, xmax, ymax)로 좌표 변환 상수 교체 (Erlangen이면 값 그대로)"""
+    global OFFSET_X, OFFSET_Y, HEIGHT
+    from rsu_lib.scenario import boundary
+    x0, y0, x1, y1 = boundary(net_xml)
+    OFFSET_X, OFFSET_Y, HEIGHT = x0, y0, y1 - y0
+
+
 def load_buildings(poly_xml):
     """건물 폴리곤 목록 → [np.array (n,2) 시뮬 좌표, 닫힌 다각형]"""
     polys = []

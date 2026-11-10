@@ -4,19 +4,22 @@
 step5_make_traffic.py   (SUMO 없이 순수 파이썬, 몇 초)
 ================================================================
 교수님 코멘트: 같은 지도에서 이동 패턴 3종 → 평균·표준편차
-  P1 기존     : 지금까지 쓴 erlangen.rou.xml 그대로 (랜덤 출발·도착, 47대)
+  P1 기존/랜덤: Erlangen은 지금까지 쓴 erlangen.rou.xml 그대로, 다른 지도는 도로 길이 비례 랜덤 출발·도착
   P2 도심 집중: 출발·목적지를 도심(도로 밀도 최고 지점)에 몰리게 뽑음 (가우시안 가중치, σ=350m)
   P3 간선 통과: 지도 가장자리 → 반대쪽 가장자리로 지나가는 차량, 빠른 도로(간선) 선호
 공통: 차량 47대, 출발 0~0.92초(기존과 동일), 경로는 목적지를 이어 붙여 ≥6km
       (200초 동안 지도 밖으로 나가지 않게 — 기존 step2 '무한 경로'와 같은 취지)
-출력: erlangen_P{1,2,3}.rou.xml(P1은 기존 파일 참조), erlangen_P*.sumo.cfg, erlangen_P*.launchd.xml
-      experiment_results/step5/traffic_patterns_summary.csv
-실행: python3 step5_make_traffic.py
+출력: <지도>_P{1,2,3}.rou.xml (Erlangen P1은 기존 파일 참조), <지도>_P*.sumo.cfg, <지도>_P*.launchd.xml
+      experiment_results/step5/traffic_patterns_summary[_<지도>].csv
+실행: python3 step5_make_traffic.py                    (Erlangen)
+      python3 step5_make_traffic.py --map darmstadt    (step6_osm_to_veins.py 로 지도 만든 뒤)
 ================================================================
 """
+import argparse
 import heapq
 import math
 import os
+import sys
 import xml.etree.ElementTree as ET
 
 import numpy as np
@@ -24,14 +27,17 @@ import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 os.chdir(HERE)
+sys.path.insert(0, HERE)
+from rsu_lib import surrogate as SG  # noqa: E402
+
+MAP = "erlangen"
 NET = "erlangen.net.xml"
 N_VEH, DT_DEPART, MIN_ROUTE_M = 47, 0.02, 6000.0
 OUT = os.path.join("experiment_results", "step5")
-OFFSET_X, OFFSET_Y, HEIGHT, MARGIN = 644465.09, 5491786.25, 3009.73, 25.0
 
 
 def to_sim(x, y):
-    return x - OFFSET_X + MARGIN, HEIGHT - (y - OFFSET_Y) + MARGIN
+    return SG.utm_to_sim(x, y)
 
 
 def lane_ok(l):
@@ -130,7 +136,11 @@ def make_pattern(E, name, rng):
     ids = list(E)
     X = np.array([E[i]["x"] for i in ids]); Y = np.array([E[i]["y"] for i in ids])
     L = np.array([E[i]["len"] for i in ids])
-    if name == "P2":
+    if name == "P1":   # 도로 길이 비례 랜덤 (다른 지도용)
+        w = L.astype(float)
+        cost = {i: E[i]["len"] / E[i]["speed"] for i in ids}
+        w_start = w
+    elif name == "P2":
         cx, cy = downtown(E)
         w = L * np.exp(-((X - cx) ** 2 + (Y - cy) ** 2) / (2 * 350.0 ** 2))
         cost = {i: E[i]["len"] / E[i]["speed"] for i in ids}
@@ -151,7 +161,8 @@ def make_pattern(E, name, rng):
             tries += 1
             dst = ids[rng.choice(len(ids), p=p)]
             dd = math.hypot(E[dst]["x"] - E[cur]["x"], E[dst]["y"] - E[cur]["y"])
-            if dst == cur or dd < (1200 if name == "P3" else 250):
+            far = 1200 if (name == "P3" and tries <= 100) else 250   # 작은 지도에서 100번 실패하면 조건 완화
+            if dst == cur or dd < far:
                 continue
             path = dijkstra(E, cur, dst, cost)
             if not path or len(path) < 2:
@@ -179,9 +190,9 @@ def read_routes(path):
 CFG = """<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <input>
-        <net-file value="erlangen.net.xml"/>
+        <net-file value="{m}.net.xml"/>
         <route-files value="{rou}"/>
-        <additional-files value="erlangen.poly.xml"/>
+        <additional-files value="{m}.poly.xml"/>
     </input>
     <time>
         <begin value="0"/>
@@ -198,15 +209,21 @@ CFG = """<?xml version="1.0" encoding="UTF-8"?>
 LAUNCHD = """<?xml version="1.0"?>
 <!-- step5 traffic pattern {p} -->
 <launch>
-    <copy file="erlangen.net.xml" />
+    <copy file="{m}.net.xml" />
     <copy file="{rou}" />
-    <copy file="erlangen.poly.xml" />
-    <copy file="erlangen_{p}.sumo.cfg" type="config" />
+    <copy file="{m}.poly.xml" />
+    <copy file="{m}_{p}.sumo.cfg" type="config" />
 </launch>
 """
 
 
 def main():
+    global MAP, NET
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--map", default="erlangen")
+    MAP = ap.parse_args().map
+    NET = f"{MAP}.net.xml"
+    SG.set_map(NET)
     os.makedirs(OUT, exist_ok=True)
     E = load_net()
     print(f"도로 엣지 {len(E)}개 (승용차 통행 + 서로 연결된 덩어리)")
@@ -214,16 +231,16 @@ def main():
     print(f"도심(도로 밀도 최고) = ({cx:.0f}, {cy:.0f})  [시뮬 좌표]")
     rows = []
     for p, seed in (("P1", None), ("P2", 2), ("P3", 3)):
-        if p == "P1":
+        if p == "P1" and MAP == "erlangen":
             rou, routes = "erlangen.rou.xml", read_routes("erlangen.rou.xml")
         else:
-            rou = f"erlangen_{p}.rou.xml"
-            routes = make_pattern(E, p, np.random.default_rng(seed))
+            rou = f"{MAP}_{p}.rou.xml"
+            routes = make_pattern(E, p, np.random.default_rng(seed if seed is not None else 1))
             write_routes(rou, routes)
-        with open(f"erlangen_{p}.sumo.cfg", "w", encoding="utf-8") as f:
-            f.write(CFG.format(rou=rou))
-        with open(f"erlangen_{p}.launchd.xml", "w", encoding="utf-8") as f:
-            f.write(LAUNCHD.format(p=p, rou=rou))
+        with open(f"{MAP}_{p}.sumo.cfg", "w", encoding="utf-8") as f:
+            f.write(CFG.format(rou=rou, m=MAP))
+        with open(f"{MAP}_{p}.launchd.xml", "w", encoding="utf-8") as f:
+            f.write(LAUNCHD.format(p=p, rou=rou, m=MAP))
         # 요약: 경로 길이, 도심 600m 안 비율, 간선(>=60km/h) 비율 — 첫 2km(≈200초 주행분) 기준
         Ls, cen, art = [], [], []
         for r in routes:
@@ -241,9 +258,12 @@ def main():
         rows.append(dict(Pattern=p, Route_file=rou, Vehicles=len(routes), Route_km_mean=round(np.mean(Ls) / 1000, 2),
                          Downtown600m_share=round(100 * np.mean(cen), 1), Arterial_share=round(100 * np.mean(art), 1)))
     S = pd.DataFrame(rows)
-    S.to_csv(os.path.join(OUT, "traffic_patterns_summary.csv"), index=False, encoding="utf-8-sig")
+    S.insert(0, "Map", MAP)
+    tag = "" if MAP == "erlangen" else f"_{MAP}"
+    S.to_csv(os.path.join(OUT, f"traffic_patterns_summary{tag}.csv"), index=False, encoding="utf-8-sig")
     print(S.to_string(index=False))
-    print("다음: VM에서 python3 step5_snapshots.py  (SUMO로 차량 위치 스냅샷 추출)")
+    pre = "" if MAP == "erlangen" else "DA_"
+    print(f"다음: python3 step5_snapshots.py --patterns {pre}P1,{pre}P2,{pre}P3")
 
 
 if __name__ == "__main__":

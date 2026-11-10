@@ -21,6 +21,7 @@ step5_placements.py   (VM, 시뮬레이션 0회 — 패턴마다 커버리지 �
 출력: experiment_results/step5/<패턴>/placements.csv, timing.csv,
       fig_pred_cover_and_time.png (예측 커버·K별 시간), map_K5.png / map_K10.png (방법별 배치 지도)
 실행: python3 -u step5_placements.py --patterns P1,P2,P3 2>&1 | tee step5_place_log.txt
+      Darmstadt: python3 -u step5_placements.py --patterns DA_P1,DA_P2,DA_P3 2>&1 | tee step6_place_log.txt
       연속 GA만 다시: python3 -u step5_placements.py --only-cga 2>&1 | tee step5_cga_log.txt
 ================================================================
 """
@@ -42,6 +43,7 @@ os.chdir(HERE)
 sys.path.insert(0, HERE)
 from rsu_lib.surrogate import Surrogate  # noqa: E402
 from rsu_lib import candidates as CA  # noqa: E402
+from rsu_lib import scenario as SC  # noqa: E402
 from rsu_lib.placement import CoverageMatrix, greedy_marginal, SetGA  # noqa: E402
 from rsu_lib.rl import PPOAgent, DQNAgent  # noqa: E402
 
@@ -58,12 +60,25 @@ def cm_from(coords, M, ids=None):
     return cm
 
 
-def build(S, pdir, force=False):
-    cand = {"A": [(x, y) for _, x, y in CA.intersections("erlangen.net.xml")],
-            "B": [(x, y) for _, x, y in CA.all_junctions("erlangen.net.xml")],
-            "R": [tuple(p) for p in CA.road_points("erlangen.net.xml", 25)]}
-    g = pd.read_csv("bruteforce_grid_150n_corrected.csv", encoding="utf-8-sig")
-    cand["G"] = list(zip(g.Sim_X, g.Sim_Y))
+def grid_points(net, R, step=150.0, near=100.0):
+    """다른 지도용 격자: 지도 전체 150m 간격 점 중 도로에서 100m 안 (Erlangen 격자 340곳과 같은 기준)"""
+    W, H = SC.size(net)
+    gx, gy = np.meshgrid(np.arange(25 + step / 2, W, step), np.arange(25 + step / 2, H, step))
+    G = np.c_[gx.ravel(), gy.ravel()]
+    Rr = np.asarray(R)
+    keep = [np.hypot(Rr[:, 0] - x, Rr[:, 1] - y).min() <= near for x, y in G]
+    return [tuple(p) for p in G[keep]]
+
+
+def build(S, pdir, F, force=False):
+    cand = {"A": [(x, y) for _, x, y in CA.intersections(F["net"])],
+            "B": [(x, y) for _, x, y in CA.all_junctions(F["net"])],
+            "R": [tuple(p) for p in CA.road_points(F["net"], 25)]}
+    if F["grid"]:
+        g = pd.read_csv(F["grid"], encoding="utf-8-sig")
+        cand["G"] = list(zip(g.Sim_X, g.Sim_Y))
+    else:
+        cand["G"] = grid_points(F["net"], cand["R"])
     cache = os.path.join(pdir, "_coverage_cache.npz")
     if os.path.exists(cache) and not force:
         z = np.load(cache)
@@ -84,14 +99,15 @@ def build(S, pdir, force=False):
 def run_pattern(p, a):
     pdir = os.path.join(OUT, p)
     os.makedirs(pdir, exist_ok=True)
-    snap = f"vehicle_snapshots_2s_{p}.csv"
+    F = SC.use(p)
+    snap = F["snap"]
     if not os.path.exists(snap):
-        sys.exit(f"{snap} 없음 → 먼저 python3 step5_snapshots.py")
-    print(f"\n===== {p} =====")
-    S = Surrogate("erlangen.poly.xml", snap)
+        sys.exit(f"{snap} 없음 → 먼저 python3 step5_snapshots.py --patterns {p}")
+    print(f"\n===== {p} ({F['map']}) =====")
+    S = Surrogate(F["poly"], snap)
     if a.only_cga:
         return rerun_cga(S, p, pdir, a)
-    cms, secs = build(S, pdir, a.force_matrix)
+    cms, secs = build(S, pdir, F, a.force_matrix)
     A, B, R, G = cms["A"], cms["B"], cms["R"], cms["G"]
     place, timing = [], []
 
@@ -241,7 +257,8 @@ def figures(S, P, T, p, pdir):
             ax.scatter(S.pts[cov, 0], S.pts[cov, 1], s=1.5, color="#9cc3f0")
             ax.scatter(c[:, 0], c[:, 1], s=60, marker="X", color=COL[m], edgecolor="#0b0b0b", lw=0.6, zorder=5)
             ax.set_title(f"{EN[m]}: {row.Pred_Cover:.1f}%", fontsize=9, loc="left")
-            ax.set_xlim(0, 2660); ax.set_ylim(3060, 0); ax.set_aspect("equal"); ax.set_xticks([]); ax.set_yticks([])
+            W, H = SC.size(SC.files(p)["net"])
+            ax.set_xlim(0, W); ax.set_ylim(H, 0); ax.set_aspect("equal"); ax.set_xticks([]); ax.set_yticks([])
         for ax in axes[len(sub):]:
             ax.axis("off")
         fig.suptitle(f"{p}, K={K} placements (blue = vehicle positions covered, grey = not covered)", x=0.01, ha="left", fontsize=10)
