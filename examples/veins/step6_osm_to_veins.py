@@ -45,6 +45,11 @@ TYPEMAP = """<polygonTypes>
 
 
 def tool(name):
+    if not os.environ.get("SUMO_HOME"):          # xsd를 인터넷에서 찾다 실패하는 것 방지
+        for cand in ("/home/veins/src/sumo", "/usr/share/sumo", "/usr/local/share/sumo"):
+            if os.path.isdir(os.path.join(cand, "data", "xsd")):
+                os.environ["SUMO_HOME"] = cand
+                break
     for d in [os.path.join(os.environ.get("SUMO_HOME", ""), "bin"), ""]:
         p = shutil.which(os.path.join(d, name) if d else name)
         if p:
@@ -142,7 +147,9 @@ def main():
     name = a.map
     osm, net, poly = f"{name}.osm", f"{name}.net.xml", f"{name}.poly.xml"
     download(name, osm)
+    s, w, n, e = BBOX[name]
     run([tool("netconvert"), "--osm-files", osm, "-o", net,
+         "--keep-edges.in-geo-boundary", f"{w},{s},{e},{n}",  # 다운로드 영역 밖으로 뻗은 도로는 자름 (Erlangen과 크기 맞춤)
          "--offset.disable-normalization", "true",          # Erlangen처럼 UTM 좌표 그대로 (convBoundary = UTM)
          "--keep-edges.by-vclass", "passenger", "--remove-edges.isolated", "true",
          "--geometry.remove", "true", "--roundabouts.guess", "true", "--ramps.guess", "true",
