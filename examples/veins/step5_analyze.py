@@ -190,6 +190,8 @@ def main():
         d["패턴 수"] = len(pp)
         tr.append(d)
     TT = pd.DataFrame(tr)
+    kcols = sorted([c for c in TT.columns if c.startswith("K=")], key=lambda c: int(c[2:].split()[0]))
+    TT = TT[["방법"] + kcols + ["준비(s)", "학습(s)", "전체(s)", "패턴 수"]]
     TT.to_csv(os.path.join(AN, "timing_table.csv"), index=False, encoding="utf-8-sig")
     md(TT, os.path.join(AN, "timing_table.md"))
     fig, ax = plt.subplots(figsize=(8, 4.2))
