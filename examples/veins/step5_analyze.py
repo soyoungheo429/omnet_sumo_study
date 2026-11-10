@@ -46,7 +46,8 @@ EN = {"GA-연속그룹 (기존 연산)": "Continuous group-GA (old operators)", 
 COL = {"GA-연속그룹 (기존 연산)": "#f3d27a", "Grid top-K": "#8d8c86", "Greedy-교차로": "#2a6fdb", "Greedy-전체교차로": "#1b998b", "GA-집합 (도로점)": "#eb6834",
        "GA-연속그룹": "#e3a008", "PPO": "#8e44ad", "DQN": "#c0392b", "최적해(ILP)": "#0b0b0b"}
 PAT = {"P1": "Erlangen P1 random", "P2": "Erlangen P2 downtown", "P3": "Erlangen P3 arterial",
-       "DA_P1": "Darmstadt P1 random", "DA_P2": "Darmstadt P2 downtown", "DA_P3": "Darmstadt P3 arterial"}
+       "DA_P1": "Darmstadt P1 random", "DA_P2": "Darmstadt P2 downtown", "DA_P3": "Darmstadt P3 arterial",
+       "GN_P1": "Gangnam P1 random", "GN_P2": "Gangnam P2 downtown", "GN_P3": "Gangnam P3 arterial"}
 
 
 def md(df, path):
@@ -135,9 +136,9 @@ def main():
     O = C.groupby("Method").agg(Scenarios=("K", "size"), 평균순위_전체지표=("Rank_Score_all", "mean"),
                                 평균순위_시간제외=("Rank_Score_noTime", "mean"), 평균순위_TOPSIS=("Rank_TOPSIS", "mean"),
                                 종합점수_평균=("Score_all", "mean"), 종합점수_표준편차=("Score_all", "std"))
-    C["Map"] = np.where(C.Pattern.str.startswith("DA_"), "Darmstadt", "Erlangen")
+    C["Map"] = C.Pattern.map(lambda p: {"DA": "Darmstadt", "GN": "Gangnam"}.get(p.split("_")[0], "Erlangen"))
     if C.Map.nunique() > 1:
-        for mp in ("Erlangen", "Darmstadt"):
+        for mp in [m for m in ("Erlangen", "Darmstadt", "Gangnam") if m in set(C.Map)]:
             O[f"평균순위_{mp}"] = C[C.Map == mp].groupby("Method").Rank_Score_all.mean()
     for p in pats:
         O[f"평균순위_{p}"] = C[C.Pattern == p].groupby("Method").Rank_Score_all.mean()

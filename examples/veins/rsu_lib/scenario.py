@@ -3,12 +3,13 @@
 rsu_lib/scenario.py — 시나리오(지도 × 교통 패턴) 이름 → 파일 이름 / 좌표 변환 설정
   Erlangen  : P1, P2, P3          → erlangen.net.xml, erlangen_P2.rou.xml, vehicle_snapshots_2s_P2.csv ...
   Darmstadt : DA_P1, DA_P2, DA_P3 → darmstadt.net.xml, darmstadt_P2.rou.xml, vehicle_snapshots_2s_DA_P2.csv ...
+  서울 강남 : GN_P1, GN_P2, GN_P3 → gangnam.net.xml, ...
 지도마다 net.xml 의 convBoundary 로 시뮬레이션 좌표 변환(x−xmin+25, 위아래 뒤집기)을 맞춘다 (surrogate.set_map).
 """
 import os
 import re
 
-MAPS = {"": "erlangen", "DA": "darmstadt"}   # 시나리오 접두어 → 지도 이름
+MAPS = {"": "erlangen", "DA": "darmstadt", "GN": "gangnam"}   # 시나리오 접두어 → 지도 이름
 
 
 def map_of(scen):
@@ -45,3 +46,11 @@ def boundary(net_xml):
 def size(net_xml, margin=25.0):
     x0, y0, x1, y1 = boundary(net_xml)
     return x1 - x0 + 2 * margin, y1 - y0 + 2 * margin
+
+
+PREFIX = {v: k for k, v in MAPS.items()}   # 지도 이름 → 시나리오 접두어
+LABEL = {"erlangen": "Erlangen", "darmstadt": "Darmstadt", "gangnam": "Seoul Gangnam"}
+
+
+def scen_name(mp, pat):
+    return pat if mp == "erlangen" else f"{PREFIX[mp]}_{pat}"

@@ -3,16 +3,17 @@
 """
 step6_osm_to_veins.py   (VM — OSM 다운로드 + SUMO netconvert/polyconvert, 몇 분)
 ================================================================
-교수님 코멘트: 다른 지도에서도 같은 실험 → Darmstadt 도심 (Erlangen과 비슷한 약 2.6 × 3.0 km)
+교수님 코멘트: 다른 지도에서도 같은 실험
+  darmstadt : 독일 Darmstadt 도심 (불규칙 유럽식 도로, 건물 촘촘)
+  gangnam   : 서울 강남 테헤란로 일대 (바둑판 격자 + 넓은 간선, 고층 건물)  — 둘 다 Erlangen과 비슷한 약 2.6 × 3.0 km
   1) OpenStreetMap에서 영역 다운로드 (Overpass API)                         → darmstadt.osm
   2) netconvert: 승용차 도로만, 좌표는 UTM 그대로(Erlangen과 같은 방식)       → darmstadt.net.xml
   3) polyconvert: 건물 외곽선 → type="building" 만 남김 (Veins 건물 감쇠: 벽 1번 9dB + 건물 안 0.4dB/m,
      config.xml 의 SimpleObstacleShadowing 이 type="building" 다각형을 그대로 씀)  → darmstadt.poly.xml
   4) 점검: 도로·교차로·건물 수를 Erlangen과 비교, 도로+건물 지도 그림
 출력: darmstadt.osm / .net.xml / .poly.xml, experiment_results/step5/map_check_darmstadt.png, map_compare.csv
-실행: python3 step6_osm_to_veins.py
-      (VM에서 다운로드가 막히면: 브라우저로 아래 URL을 열어 darmstadt.osm 으로 저장 후 다시 실행)
-다음: python3 step5_make_traffic.py --map darmstadt
+실행: python3 step6_osm_to_veins.py --map darmstadt   /   python3 step6_osm_to_veins.py --map gangnam
+다음: python3 step5_make_traffic.py --map <지도>
 ================================================================
 """
 import argparse
@@ -35,9 +36,12 @@ os.chdir(HERE)
 sys.path.insert(0, HERE)
 OUT = os.path.join("experiment_results", "step5")
 # 남, 서, 북, 동  (Darmstadt 도심: Luisenplatz 중심, 약 2.6 km × 3.0 km)
-BBOX = dict(darmstadt=(49.859, 8.633, 49.886, 8.669))
-SERVERS = ["https://overpass-api.de/api/map?bbox={w},{s},{e},{n}",
-           "https://overpass.kumi.systems/api/map?bbox={w},{s},{e},{n}"]
+BBOX = dict(darmstadt=(49.859, 8.633, 49.886, 8.669),
+            gangnam=(37.490, 127.022, 37.517, 127.0515))   # 강남역~역삼~선릉 테헤란로 일대, 약 2.6 × 3.0 km
+# 도로·건물만 받는 가벼운 요청 (전체 지도 /api/map 은 서버가 자주 502/시간초과)
+QUERY = "[out:xml][timeout:300][bbox:{s},{w},{n},{e}];(way[highway];way[building];relation[building];);(._;>;);out body;"
+SERVERS = ["https://overpass.private.coffee/api/interpreter", "https://overpass-api.de/api/interpreter",
+           "https://overpass.kumi.systems/api/interpreter"]
 TYPEMAP = """<polygonTypes>
     <polygonType id="building" name="building" color="1,0,0" layer="-1"/>
 </polygonTypes>
@@ -70,19 +74,20 @@ def download(name, osm):
         print(f"{osm} 이미 있음 ({os.path.getsize(osm) / 1e6:.1f} MB) → 다운로드 생략")
         return
     s, w, n, e = BBOX[name]
+    import urllib.parse
+    body = urllib.parse.urlencode({"data": QUERY.format(s=s, w=w, n=n, e=e)}).encode()
     for url in SERVERS:
-        url = url.format(s=s, w=w, n=n, e=e)
         print("다운로드:", url, flush=True)
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": "rsu-placement-study/1.0"})
-            with urllib.request.urlopen(req, timeout=300) as r, open(osm, "wb") as f:
+            req = urllib.request.Request(url, data=body, headers={"User-Agent": "rsu-placement-study/1.0"})
+            with urllib.request.urlopen(req, timeout=600) as r, open(osm, "wb") as f:
                 shutil.copyfileobj(r, f)
-            if os.path.getsize(osm) > 10000:
+            if os.path.getsize(osm) > 100000:
                 print(f"  → {osm} {os.path.getsize(osm) / 1e6:.1f} MB")
                 return
         except Exception as ex:  # 다음 서버 시도
             print("  실패:", ex)
-    sys.exit("OSM 다운로드 실패 → 위 URL을 브라우저로 열어 저장한 뒤 다시 실행하세요.")
+    sys.exit("OSM 다운로드 실패 → 잠시 뒤 다시 실행하세요 (서버 혼잡).")
 
 
 def filter_buildings(src, dst, net_xml):
@@ -162,9 +167,8 @@ def main():
     k, d = filter_buildings(f"_{name}.poly.raw.xml", poly, net)
     os.remove(f"_{name}.poly.raw.xml"); os.remove(f"_{name}.typ.xml")
     print(f"건물 {k}개 남김 (그 외 {d}개 제외) → {poly}")
-    rows = [stats(name)]
-    if os.path.exists("erlangen.net.xml"):
-        rows.insert(0, stats("erlangen"))
+    rows = [stats(m) for m in ("erlangen", "darmstadt", "gangnam")
+            if os.path.exists(f"{m}.net.xml") and os.path.exists(f"{m}.poly.xml")]
     T = pd.DataFrame(rows)
     T.to_csv(os.path.join(OUT, "map_compare.csv"), index=False, encoding="utf-8-sig")
     print(T.to_string(index=False))

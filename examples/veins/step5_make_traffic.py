@@ -12,7 +12,7 @@ step5_make_traffic.py   (SUMO 없이 순수 파이썬, 몇 초)
 출력: <지도>_P{1,2,3}.rou.xml (Erlangen P1은 기존 파일 참조), <지도>_P*.sumo.cfg, <지도>_P*.launchd.xml
       experiment_results/step5/traffic_patterns_summary[_<지도>].csv
 실행: python3 step5_make_traffic.py                    (Erlangen)
-      python3 step5_make_traffic.py --map darmstadt    (step6_osm_to_veins.py 로 지도 만든 뒤)
+      python3 step5_make_traffic.py --map darmstadt    (또는 --map gangnam, step6_osm_to_veins.py 로 지도 만든 뒤)
 ================================================================
 """
 import argparse
@@ -262,8 +262,8 @@ def main():
     tag = "" if MAP == "erlangen" else f"_{MAP}"
     S.to_csv(os.path.join(OUT, f"traffic_patterns_summary{tag}.csv"), index=False, encoding="utf-8-sig")
     print(S.to_string(index=False))
-    pre = "" if MAP == "erlangen" else "DA_"
-    print(f"다음: python3 step5_snapshots.py --patterns {pre}P1,{pre}P2,{pre}P3")
+    from rsu_lib.scenario import scen_name
+    print(f"다음: python3 step5_snapshots.py --patterns {','.join(scen_name(MAP, q) for q in ('P1', 'P2', 'P3'))}")
 
 
 if __name__ == "__main__":

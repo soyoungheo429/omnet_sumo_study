@@ -96,7 +96,7 @@ def main():
         ax.hexbin(sx, sy, gridsize=35, cmap="Blues", mincnt=1, extent=(0, W, 0, H))
         ax.set_title(f"{names[SC.files(p)['pattern']]}  (n={len(d)})", loc="left", fontsize=10)
         ax.set_xlim(0, W); ax.set_ylim(H, 0); ax.set_aspect("equal"); ax.set_xticks([]); ax.set_yticks([])
-    fig.suptitle(f"{mp.capitalize()}: vehicle position density for 3 traffic patterns (10–200 s, every 2 s)", x=0.01, ha="left")
+    fig.suptitle(f"{SC.LABEL.get(mp, mp)}: vehicle position density for 3 traffic patterns (10–200 s, every 2 s)", x=0.01, ha="left")
     plt.tight_layout(); plt.savefig(os.path.join(OUT, f"traffic_patterns_map{tag}.png"), dpi=150); plt.close()
     print(f"다음: python3 -u step5_placements.py --patterns {','.join(pats)}")
 
