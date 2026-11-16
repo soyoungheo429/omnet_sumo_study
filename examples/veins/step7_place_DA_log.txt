@@ -1,0 +1,15 @@
+nohup: ignoring input
+/home/veins/.local/lib/python3.9/site-packages/matplotlib/projections/__init__.py:63: UserWarning: Unable to import Axes3D. This may be due to multiple versions of Matplotlib being installed (e.g. as a system package and as a pip package). As a result, the 3D projection is not available.
+  warnings.warn("Unable to import Axes3D. This may be due to multiple versions of "
+
+===== DA_P1 (darmstadt) =====
+Traceback (most recent call last):
+  File "/home/veins/veins/examples/veins/step5_placements.py", line 374, in <module>
+    main()
+  File "/home/veins/veins/examples/veins/step5_placements.py", line 369, in main
+    run_pattern(p, a)
+  File "/home/veins/veins/examples/veins/step5_placements.py", line 112, in run_pattern
+    cms, secs = build(S, pdir, F, a.force_matrix, a.road_step, need_R=a.with_setga)
+  File "/home/veins/veins/examples/veins/step5_placements.py", line 82, in build
+    cand["G"] = grid_points(F["net"], cand["R"])
+KeyError: 'R'

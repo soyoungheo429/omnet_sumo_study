@@ -1,0 +1,4 @@
+﻿Map,Pattern,Route_file,Vehicles,Route_km_mean,Downtown600m_share,Arterial_share
+darmstadt,P1,darmstadt_P1.rou.xml,47,7.09,12.9,0.1
+darmstadt,P2,darmstadt_P2.rou.xml,47,6.48,91.4,0.0
+darmstadt,P3,darmstadt_P3.rou.xml,47,7.62,6.8,0.6

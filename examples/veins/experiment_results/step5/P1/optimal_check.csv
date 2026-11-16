@@ -1,0 +1,11 @@
+﻿Pattern,K,ILP_cover,ILP_s,BF_cover,BF_finished,BF_nodes,BF_s,Same
+P1,1,29.384,2.039,29.384,True,1,0.01,True
+P1,2,47.256,0.151,47.256,True,190,0.06,True
+P1,3,60.157,0.146,60.157,True,8053,1.45,True
+P1,4,65.89,0.162,65.89,True,216752,32.77,True
+P1,5,71.377,0.148,71.377,False,4611730,600.0,False
+P1,6,76.17,0.153,,False,0,0.0,False
+P1,7,80.09,0.457,,False,0,0.0,False
+P1,8,83.897,0.192,,False,0,0.0,False
+P1,9,85.868,0.988,,False,0,0.0,False
+P1,10,87.772,0.422,,False,0,0.0,False
