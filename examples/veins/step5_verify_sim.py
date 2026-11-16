@@ -40,7 +40,7 @@ DEFAULT_METHODS = ("Grid top-K,Greedy-교차로,Greedy-전체교차로,GA-연속
 COLS = ["Key", "Pattern", "Methods", "K", "Rep", "Seed", "Coords", "Pred_Cover", "Success", "Elapsed_Sec", "PDR",
         "Service_Ratio", "Total_Received", "Jain_RSU", "Jain_Vehicle", "PER", "Collisions", "RSSI_Mean_dBm",
         "SNR_Mean_dB", "Channel_Busy", "RXTX_Lost", "Metrics_OK", "Error", "Effective_Received", "Alive_Slots"]
-ALIVE_SLOTS_APPROX = 93784   # 예전 run(유효 수신량 기록 전): 47대 × (200초 − 출발시각) / 0.1초
+ALIVE_SLOTS_APPROX = 93784   # 최후 대체값(47대 × 200초 / 0.1초). 실제로는 실측값으로 복원
 METRICS = ["Service_Ratio", "Effective_Received", "Duplication", "PDR", "Total_Received", "Jain_RSU", "Jain_Vehicle", "RSSI_Mean_dBm", "PER",
            "Collisions", "Channel_Busy", "Elapsed_Sec"]
 T95 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8: 2.306, 9: 2.262, 10: 2.228}
@@ -82,8 +82,19 @@ def add_derived(raw):
     for c in ("Effective_Received", "Alive_Slots"):
         if c not in raw.columns:
             raw[c] = np.nan
-    alive = raw.Alive_Slots.where(raw.Alive_Slots.notna(), ALIVE_SLOTS_APPROX)
+    # 예전 run(유효 수신량 기록 전)은 "같은 패턴·K·seed로 새로 돌린 run"의 실측 차량-칸 수(Alive_Slots)로 복원:
+    # 서비스 비율 = 유효 수신량 ÷ 차량-칸 수 이므로, 차량-칸 수만 알면 유효 수신량이 정확히 나옴
+    # (차량-칸 수는 교통·K·seed에 따라 70,000~92,000으로 달라서 고정값을 쓰면 안 됨)
+    rec = raw[raw.Alive_Slots.notna()]
+    lut = rec.groupby(["Pattern", "K", "Seed"]).Alive_Slots.median()
+    lut_p = rec.groupby("Pattern").Alive_Slots.median()
+    alive = raw.Alive_Slots.copy()
+    miss = alive.isna()
+    alive[miss] = [lut.get((p, k, sd), lut_p.get(p, ALIVE_SLOTS_APPROX)) for p, k, sd in
+                   zip(raw.Pattern[miss], raw.K[miss], raw.Seed[miss])]
     eff = raw.Effective_Received.where(raw.Effective_Received.notna(), raw.Service_Ratio / 100 * alive)
+    raw["Effective_Source"] = np.where(raw.Effective_Received.notna(), "기록", "복원")
+    raw["Alive_Slots"] = alive
     raw["Effective_Received"] = eff
     raw["Duplication"] = raw.Total_Received / eff.where(eff > 0)
     return raw
