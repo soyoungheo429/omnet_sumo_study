@@ -54,8 +54,12 @@ def ranks(S):
         r_s = b.Service_Ratio_mean.rank(ascending=False, method="min")
         r_m = pd.Series(SA.norm_score(b, SA.MET)).rank(ascending=False, method="min")
         r_t = pd.Series(SA.norm_score(b, SA.MET + [SA.TIME])).rank(ascending=False, method="min")
+        old = SA.MET + SA.MET_INFO   # 예전 기준: 8개 지표 전부
+        r_mo = pd.Series(SA.norm_score(b, old)).rank(ascending=False, method="min")
+        r_to = pd.Series(SA.norm_score(b, old + [SA.TIME])).rank(ascending=False, method="min")
         for i, r in b.iterrows():
-            out.append(dict(Pattern=p, K=K, Method=r.Method, R_service=r_s[i], R_metrics=r_m[i], R_all=r_t[i]))
+            out.append(dict(Pattern=p, K=K, Method=r.Method, R_service=r_s[i], R_metrics=r_m[i], R_all=r_t[i],
+                            R_metrics_old=r_mo[i], R_all_old=r_to[i]))
     return pd.DataFrame(out)
 
 
@@ -72,7 +76,7 @@ def main():
     R.to_csv(os.path.join(AN, "report_ranks.csv"), index=False, encoding="utf-8-sig")
     doc = ["# 실험 결과 정리 (자동 생성: step7_report.py)", "",
            "- 값: 5회 반복 평균 ± 표준편차. 순위는 K마다 매긴 순위를 K=1~10 평균 (낮을수록 좋음)",
-           "- 서비스만 = 서비스 비율 순위 / 모든 지표 = 서비스·총수신·Jain RSU·Jain 차량 / +시간 = 여기에 계산 시간 추가",
+           "- 서비스만 = 서비스 비율 순위 / 새 4개 = 서비스·총수신·Jain RSU·Jain 차량 / 예전 8개 = 새 4개 + RSSI·PER·충돌·채널점유율 / +시간 = 여기에 계산 시간 추가",
            "- RSSI·PER·충돌·채널 점유율은 표에만 표시하고 순위에서 제외: PER·충돌·점유율은 모든 방법이 거의 0이라 차이가 무의미하고, RSSI는 성공 수신만 평균이라 넓게 덮을수록 낮아지는 편향이 있음 (아래 '지표별 방법 간 차이 크기' 참고)",
            "- 유효 수신량 = BSM을 1개 이상 받은 차량-0.1초 칸 수(중복 제외), 총 수신량 = 받은 BSM 전부(중복 포함), 중복도 = 총 ÷ 유효", ""]
     pats = sorted(S.Pattern.unique(), key=lambda p: (list(MAPS.values()).index(mapof(p)), p))
@@ -88,7 +92,8 @@ def main():
                 q = d[d.Method == m].set_index("K")
                 cells = {f"K={k}": (f"{q.loc[k, 'Service_Ratio_mean']:.1f} ± {q.loc[k, 'Service_Ratio_std']:.2f}" if k in q.index else "–") for k in range(1, 11)}
                 rows.append(dict(방법=LBL[m], **cells, 평균=round(q.Service_Ratio_mean.mean(), 1),
-                                 서비스만=round(q.R_service.mean(), 1), 모든지표=round(q.R_metrics.mean(), 1), 모든지표_시간=round(q.R_all.mean(), 1)))
+                                 서비스만=round(q.R_service.mean(), 1), 새4개=round(q.R_metrics.mean(), 1), 새4개_시간=round(q.R_all.mean(), 1),
+                                 예전8개=round(q.R_metrics_old.mean(), 1), 예전8개_시간=round(q.R_all_old.mean(), 1)))
             doc += [mdtab(pd.DataFrame(rows)), "", "**표 B. 나머지 지표 (K=1~10 평균 ± 반복 표준편차 평균)**", ""]
             cols = [("Effective_Received", "유효 수신량", 0), ("Total_Received", "총 수신량", 0), ("Duplication", "중복도", 2),
                     ("PDR", "PDR(%)", 1), ("Jain_RSU", "Jain RSU", 3), ("Jain_Vehicle", "Jain 차량", 3), ("RSSI_Mean_dBm", "RSSI(dBm)", 1),
@@ -109,10 +114,12 @@ def main():
                     "  - 서비스 80% 달성 K: " + ", ".join(f"{m} {('–' if pd.isna(k) else int(k))}개" for m, k in k80.items()), ""]
         # 지도 전체 순위
         d = S[S.Pattern.isin(mps)]
-        g = d.groupby("Method").agg(svc=("Service_Ratio_mean", "mean"), rs=("R_service", "mean"), rm=("R_metrics", "mean"), ra=("R_all", "mean"))
+        g = d.groupby("Method").agg(svc=("Service_Ratio_mean", "mean"), rs=("R_service", "mean"), rm=("R_metrics", "mean"), ra=("R_all", "mean"),
+                                    rmo=("R_metrics_old", "mean"), rao=("R_all_old", "mean"))
         g = g.reindex([m for m in ORDER if m in g.index])
         tab = pd.DataFrame({"방법": [LBL[m] for m in g.index], "평균 서비스(%)": g.svc.round(1),
-                            "서비스만 순위": g.rs.round(2), "모든 지표 순위": g.rm.round(2), "모든 지표+시간 순위": g.ra.round(2)})
+                            "서비스만 순위": g.rs.round(2), "새 기준 4개 지표": g.rm.round(2), "새 기준 +시간": g.ra.round(2),
+                            "예전 8개 지표": g.rmo.round(2), "예전 8개 +시간": g.rao.round(2)})
         doc += [f"### {mp} 전체 (트래픽 {len(mps)}개 × K=1~10)", "", mdtab(tab.sort_values("서비스만 순위")), ""]
         # 시간
         t = T[T.Pattern.isin(mps)]
