@@ -36,6 +36,7 @@ TX_DBM = 10 * math.log10(50.0)          # RSU 50 mW
 ANT_GAIN_DB = 2 * -1.75                 # monopole 샘플 평균(약 −1.75dB) × 송·수신
 DB_PER_CUT, DB_PER_M = 9.0, 0.4
 THRESH_DBM = -89.0
+FAST = True                             # 빠른 건물 감쇠 계산 (결과 동일, 검증: step7_surrogate_check)
 MAX_RANGE = 700.0                       # 자유공간에서도 이 밖은 −89dBm 미만 (≈540m) → 계산 생략
 
 
@@ -133,8 +134,66 @@ class Surrogate:
             loss[i] = DB_PER_CUT * cuts + DB_PER_M * frac * dist[i]
         return loss
 
-    def rx_dbm(self, rsu):
-        """RSU 한 개(Sim 좌표) → 모든 스냅샷 점의 수신 세기(dBm). 범위 밖은 −inf"""
+    def _obstacle_loss_fast(self, s, pts, chunk=128):
+        """_obstacle_loss와 같은 규칙, 더 빠르게:
+        ① 수신점을 송신점 기준 각도 순으로 묶어(부채꼴) 묶음마다 겹치는 건물만 검사
+        ② 건물 안 통과 길이를 반복문 없이 계산 (건물별 교차점 정렬 → 짝수 번째 구간 합)"""
+        n = len(pts)
+        loss = np.zeros(n)
+        if n == 0:
+            return loss
+        d_all = pts - s
+        order = np.argsort(np.arctan2(d_all[:, 1], d_all[:, 0]))
+        for k in range(0, n, chunk):
+            idx = order[k:k + chunk]
+            P = pts[idx]
+            lo = np.minimum(P.min(0), s) - 1
+            hi = np.maximum(P.max(0), s) + 1
+            bsel = np.where((self.bbox[:, 2] >= lo[0]) & (self.bbox[:, 0] <= hi[0]) &
+                            (self.bbox[:, 3] >= lo[1]) & (self.bbox[:, 1] <= hi[1]))[0]
+            if len(bsel) == 0:
+                continue
+            emask = self._edge_mask(bsel)
+            E = self.edges[emask]
+            own = self.edge_owner[emask]
+            d = P - s
+            a, e = E[:, :2], E[:, 2:] - E[:, :2]
+            denom = d[:, None, 0] * e[None, :, 1] - d[:, None, 1] * e[None, :, 0]
+            asx, asy = a[None, :, 0] - s[0], a[None, :, 1] - s[1]
+            with np.errstate(divide="ignore", invalid="ignore"):
+                t = (asx * e[None, :, 1] - asy * e[None, :, 0]) / denom
+                u = (asx * d[:, None, 1] - asy * d[:, None, 0]) / denom
+            hit = (np.abs(denom) > 1e-12) & (t >= 0) & (t <= 1) & (u >= 0) & (u <= 1)
+            r, c = np.nonzero(hit)
+            if len(r) == 0:
+                continue
+            tv, ob = t[r, c], own[c]
+            cuts = np.bincount(r, minlength=len(idx))
+            # (행, 건물, t) 순 정렬 → 같은 (행, 건물) 묶음 안에서 [t0,t1],[t2,t3].. 구간 합
+            o = np.lexsort((tv, ob, r))
+            r, ob, tv = r[o], ob[o], tv[o]
+            grp = np.r_[True, (r[1:] != r[:-1]) | (ob[1:] != ob[:-1])]
+            gid = np.cumsum(grp) - 1
+            pos = np.arange(len(r)) - np.flatnonzero(grp)[gid]          # 묶음 안 순번
+            gsize = np.bincount(gid)
+            sign = np.where(pos % 2 == 0, -1.0, 1.0)                    # 짝수 번째 −t, 홀수 번째 +t
+            frac_g = np.bincount(gid, weights=sign * tv)
+            odd = gsize % 2 == 1                                         # 끝점이 건물 안 → 1까지
+            frac_g[odd] += 1.0
+            grow = r[grp]
+            frac = np.bincount(grow, weights=frac_g, minlength=len(idx))
+            dist = np.hypot(d[:, 0], d[:, 1])
+            loss[idx] = DB_PER_CUT * cuts + DB_PER_M * frac * dist
+        return loss
+
+    def _edge_mask(self, bsel):
+        m = np.zeros(len(self.polys), bool)
+        m[bsel] = True
+        return m[self.edge_owner]
+
+    def rx_dbm(self, rsu, cache=True):
+        """RSU 한 개(Sim 좌표) → 모든 스냅샷 점의 수신 세기(dBm). 범위 밖은 −inf
+        cache=False: 결과를 저장하지 않음 (수만 곳을 미리 계산할 때 메모리 절약)"""
         key = (round(float(rsu[0]), 1), round(float(rsu[1]), 1))
         if key in self._cache:
             return self._cache[key]
@@ -149,9 +208,10 @@ class Surrogate:
             need = pr >= self.thresh - 0.0
             sub = idx[need]
             pr2 = pr.copy()
-            pr2[need] -= self._obstacle_loss(s, self.pts[sub])
+            pr2[need] -= (self._obstacle_loss_fast if FAST else self._obstacle_loss)(s, self.pts[sub])
             out[idx] = pr2
-        self._cache[key] = out
+        if cache:
+            self._cache[key] = out
         return out
 
     def covered(self, rsu):

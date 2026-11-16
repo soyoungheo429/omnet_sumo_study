@@ -148,6 +148,7 @@ def empty_result() -> dict:
     return {
         "Total_Generated": 0, "Num_Vehicles": 0, "Expected_Received": 0,
         "Actual_Received": 0, "PDR": 0.0, "Num_RSUs": 0, "Total_Received": 0,
+        "Effective_Received": nan, "Alive_Slots": nan,
         "Service_Ratio": nan, "Jain_RSU": nan, "Jain_Vehicle": nan, "PER": nan,
         "Collisions": 0, "RXTX_Lost": 0, "RSSI_Mean_dBm": nan, "SNR_Mean_dB": nan,
         "Channel_Busy": nan, "PerRSU_Rx": "[]", "PerRSU_Source": "none", "Metrics_OK": False,

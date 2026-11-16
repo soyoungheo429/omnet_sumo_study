@@ -70,10 +70,11 @@ def grid_points(net, R, step=150.0, near=100.0):
     return [tuple(p) for p in G[keep]]
 
 
-def build(S, pdir, F, force=False, road_step=25.0):
+def build(S, pdir, F, force=False, road_step=25.0, need_R=True):
     cand = {"A": [(x, y) for _, x, y in CA.intersections(F["net"])],
-            "B": [(x, y) for _, x, y in CA.all_junctions(F["net"])],
-            "R": [tuple(p) for p in CA.road_points(F["net"], road_step)]}
+            "B": [(x, y) for _, x, y in CA.all_junctions(F["net"])]}
+    if need_R:
+        cand["R"] = [tuple(p) for p in CA.road_points(F["net"], road_step)]
     if F["grid"]:
         g = pd.read_csv(F["grid"], encoding="utf-8-sig")
         cand["G"] = list(zip(g.Sim_X, g.Sim_Y))
@@ -82,6 +83,7 @@ def build(S, pdir, F, force=False, road_step=25.0):
     cache = os.path.join(pdir, "_coverage_cache.npz")
     if os.path.exists(cache) and not force:
         z = np.load(cache)
+        cand = {k: v for k, v in cand.items() if k in z.files}
         mats = {k: np.unpackbits(z[k], axis=1)[:, : len(S.pts)].astype(bool) for k in cand}
         secs = json.loads(str(z["secs"]))
         print("  커버리지 행렬: 캐시 사용", {k: f"{v:.0f}s" for k, v in secs.items()})
@@ -107,8 +109,11 @@ def run_pattern(p, a):
     S = Surrogate(F["poly"], snap)
     if a.only_cga:
         return rerun_cga(S, p, pdir, a)
-    cms, secs = build(S, pdir, F, a.force_matrix, a.road_step)
-    A, B, R, G = cms["A"], cms["B"], cms["R"], cms["G"]
+    cms, secs = build(S, pdir, F, a.force_matrix, a.road_step, need_R=a.with_setga)
+    if a.only:
+        return rerun_only(S, F, p, pdir, a, cms, secs)
+    A, B, G = cms["A"], cms["B"], cms["G"]
+    R = cms.get("R")
     place, timing = [], []
 
     def add(m, K, coords, t):
@@ -128,8 +133,8 @@ def run_pattern(p, a):
         for K in KS:
             t = tick(); sel = greedy_marginal(cm, K)[0]; add(lab, K, cm.coords[sel], tick() - t)
         timing.append(dict(Method=lab, Prep_s=secs[key], Train_s=0))
-    # 4) 집합 GA
-    for K in KS:
+    # 4) 집합 GA (이번 비교에서는 기본 제외, --with-setga 로 포함)
+    for K in (KS if a.with_setga else []):
         t = tick(); best = None
         for run in range(a.ga_runs):
             ind, f, _ = SetGA(R, K, pop=40, gens=60, seed=run).run()
@@ -137,7 +142,13 @@ def run_pattern(p, a):
                 best = (ind, f)
         add("GA-집합 (도로점)", K, R.coords[best[0]], tick() - t)
         print(f"  Set-GA K={K}: {best[1]:.2f}%", flush=True)
-    timing.append(dict(Method="GA-집합 (도로점)", Prep_s=secs["R"], Train_s=0))
+    if a.with_setga:
+        timing.append(dict(Method="GA-집합 (도로점)", Prep_s=secs["R"], Train_s=0))
+    # 4b) 연속 그룹 GA v3 (제안): 커버 지도 미리 계산 → 평가 즉시
+    tp, rows3 = cga3(S, F, pdir, a)
+    for K, X, sec in rows3:
+        add(V3, K, X, sec)
+    timing.append(dict(Method=V3, Prep_s=tp, Train_s=0))
     # 5) 연속 그룹 GA (격자·후보 없음, 개체 = K개 연속 좌표, 첫 세대는 차량 위치에서)
     if a.cga_ks:
         for K, X, sec in cga(S, a):
@@ -167,10 +178,70 @@ def run_pattern(p, a):
         for K in KS:
             t = tick(); sel = max_cover_optimal(B, K, 60)[0]; add("최적해(ILP)", K, B.coords[sel], tick() - t)
         timing.append(dict(Method="최적해(ILP)", Prep_s=secs["B"], Train_s=0))
+        bf_check(B, p, pdir, a)
     except Exception as e:
         print("  (최적해 생략:", e, ")")
 
     save(S, pd.DataFrame(place), pd.DataFrame(timing), p, pdir)
+
+
+V3 = "GA-연속그룹 v3"
+
+
+def cga3(S, F, pdir, a):
+    """연속 그룹 GA v3: 도로 ±buffer m 안을 step m 간격으로 미리 계산한 커버 지도 + 큰 예산 GA. 반환 (준비 초, [(K, 좌표, 초)])"""
+    from rsu_lib.lattice_ga import CoverLattice, LatticeGA
+    cl = CoverLattice(S, F["net"], step=a.lat_step, buffer=a.lat_buffer,
+                      cache=os.path.join(pdir, f"_lattice_{a.lat_step:g}m_{a.lat_buffer:g}m.npz"), workers=a.workers)
+    rows = []
+    for K in KS:
+        t = time.perf_counter(); best = None
+        for run in range(a.cga3_runs):
+            X, f, _ = LatticeGA(cl, K, pop=a.cga3_pop, gens=a.cga3_gens, seed=run, init_pts=S.pts).run()
+            if best is None or f > best[1]:
+                best = (X, f)
+        sec = time.perf_counter() - t
+        print(f"  연속 GA v3 K={K}: {best[1]:.2f}%  {sec:.1f}s", flush=True)
+        rows.append((K, best[0], sec))
+    return cl.prep_s, rows
+
+
+def bf_check(B, p, pdir, a):
+    """최적해 검증: 교차점 후보에서 K곳 조합 전수 조사(가지치기) ↔ ILP 값 비교 → optimal_check.csv"""
+    from rsu_lib.bruteforce import brute_force_max_cover
+    from rsu_lib.optimal import max_cover_optimal
+    rows = []
+    for K in KS:
+        t = time.perf_counter(); isel, ival, st, gap = max_cover_optimal(B, K, 60); it = time.perf_counter() - t
+        if K <= a.bf_max_k:
+            sel, val, fin, nodes, sec = brute_force_max_cover(B.M, K, incumbent=isel, time_limit=a.bf_time)
+        else:
+            val, fin, nodes, sec = float("nan"), False, 0, 0.0
+        rows.append(dict(Pattern=p, K=K, ILP_cover=round(ival, 3), ILP_s=round(it, 3), BF_cover=round(val, 3),
+                         BF_finished=fin, BF_nodes=nodes, BF_s=round(sec, 2),
+                         Same=bool(fin and abs(val - ival) < 1e-9)))
+        print(f"  최적해 검증 K={K}: ILP {ival:.2f}%  전수조사 {val:.2f}% {'(끝까지)' if fin else '(생략/시간초과)'} {sec:.1f}s", flush=True)
+    pd.DataFrame(rows).to_csv(os.path.join(pdir, "optimal_check.csv"), index=False, encoding="utf-8-sig")
+
+
+def rerun_only(S, F, p, pdir, a, cms, secs):
+    """--only v3,bf : 지정한 것만 다시 돌려 기존 placements.csv / timing.csv 에 반영"""
+    todo = [x.strip() for x in a.only.split(",")]
+    P = pd.read_csv(os.path.join(pdir, "placements.csv"), encoding="utf-8-sig")
+    T = pd.read_csv(os.path.join(pdir, "timing.csv"), encoding="utf-8-sig")[["Method", "Prep_s", "Train_s"]]
+    if "v3" in todo:
+        tp, rows3 = cga3(S, F, pdir, a)
+        P, T = P[P.Method != V3], T[T.Method != V3]
+        new = []
+        for K, X, sec in rows3:
+            c = [[round(float(x), 2), round(float(y), 2)] for x, y in X]
+            new.append(dict(Pattern=p, Method=V3, K=K, Coords=json.dumps(c),
+                            Pred_Cover=round(S.cover_pct([tuple(q) for q in c]), 2), Time_K_s=round(sec, 4)))
+        P = pd.concat([P, pd.DataFrame(new)], ignore_index=True)
+        T = pd.concat([T, pd.DataFrame([dict(Method=V3, Prep_s=tp, Train_s=0)])], ignore_index=True)
+    if "bf" in todo:
+        bf_check(cms["B"], p, pdir, a)
+    save(S, P, T, p, pdir)
 
 
 def cga(S, a):
@@ -219,9 +290,9 @@ def save(S, P, T, p, pdir):
     print(T[["Method", "Prep_s", "Train_s", "Sum_K_s", "Total_s"]].round(2).to_string(index=False))
 
 
-EN = {"GA-연속그룹 (기존 연산)": "Continuous group-GA (old operators)", "Grid top-K": "Grid top-K", "Greedy-교차로": "Greedy-intersection", "Greedy-전체교차로": "Greedy-all junctions",
-      "GA-집합 (도로점)": "Set-GA", "GA-연속그룹": "Continuous group-GA", "PPO": "PPO", "DQN": "DQN", "최적해(ILP)": "ILP (optimal)"}
-COL = {"GA-연속그룹 (기존 연산)": "#f3d27a", "Grid top-K": "#8d8c86", "Greedy-교차로": "#2a6fdb", "Greedy-전체교차로": "#1b998b", "GA-집합 (도로점)": "#eb6834",
+EN = {"GA-연속그룹 v3": "Continuous group-GA v3 (proposed)", "GA-연속그룹 (기존 연산)": "Continuous group-GA v1 (old operators)", "Grid top-K": "Grid top-K", "Greedy-교차로": "Greedy-intersection", "Greedy-전체교차로": "Greedy-all junctions",
+      "GA-집합 (도로점)": "Set-GA", "GA-연속그룹": "Continuous group-GA v2", "PPO": "PPO", "DQN": "DQN", "최적해(ILP)": "ILP (optimal)"}
+COL = {"GA-연속그룹 v3": "#ff7f0e", "GA-연속그룹 (기존 연산)": "#f3d27a", "Grid top-K": "#8d8c86", "Greedy-교차로": "#2a6fdb", "Greedy-전체교차로": "#1b998b", "GA-집합 (도로점)": "#eb6834",
        "GA-연속그룹": "#e3a008", "PPO": "#8e44ad", "DQN": "#c0392b", "최적해(ILP)": "#0b0b0b"}
 
 
@@ -271,7 +342,17 @@ def main():
     ap.add_argument("--force-matrix", action="store_true")
     ap.add_argument("--ga-runs", type=int, default=2)
     ap.add_argument("--road-step", type=float, default=25.0, help="집합 GA 도로 위 후보점 간격(m). 큰 지도는 50")
-    ap.add_argument("--cga-ks", default="1,2,3,4,5,6,7,8,9,10", help="연속 GA 돌릴 K (빈 문자열이면 생략)")
+    ap.add_argument("--cga-ks", default="", help="연속 GA v2 돌릴 K (기본 생략, 예: 1,2,...,10)")
+    ap.add_argument("--with-setga", action="store_true", help="집합 GA도 실행 (기본 제외)")
+    ap.add_argument("--only", default="", help="일부만 다시 돌려 기존 결과에 반영: v3 (연속 GA v3), bf (최적해 전수조사 검증). 예: --only v3,bf")
+    ap.add_argument("--lat-step", type=float, default=5.0, help="v3 커버 지도 간격(m)")
+    ap.add_argument("--lat-buffer", type=float, default=30.0, help="v3 커버 지도 범위: 도로 양옆(m)")
+    ap.add_argument("--workers", type=int, default=0, help="커버 지도 병렬 계산 프로세스 수 (0 = CPU 전부)")
+    ap.add_argument("--cga3-pop", type=int, default=50)
+    ap.add_argument("--cga3-gens", type=int, default=150)
+    ap.add_argument("--cga3-runs", type=int, default=2)
+    ap.add_argument("--bf-max-k", type=int, default=5, help="전수조사로 검증할 최대 K (그 위는 ILP만)")
+    ap.add_argument("--bf-time", type=int, default=600, help="K 하나 전수조사 시간 제한(초)")
     ap.add_argument("--cga-init", default="vehicles", choices=["vehicles", "uniform"],
                     help="첫 세대: vehicles=차량 위치에서 K개 / uniform=지도 전체 랜덤(지난주 algo4)")
     ap.add_argument("--cga-ops", default="gene", choices=["gene", "avg"],

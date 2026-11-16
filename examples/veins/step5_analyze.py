@@ -37,13 +37,17 @@ os.chdir(HERE)
 OUT = os.path.join("experiment_results", "step5")
 AN = os.path.join(OUT, "analysis")
 # (지표, 표 이름, 방향 +1=클수록 좋음)
-MET = [("Service_Ratio", "서비스 비율(%)", 1), ("PDR", "PDR(%)", 1), ("Total_Received", "총 수신량", 1),
+# 종합 점수에 쓰는 지표 (지표 재설계: 서로 같은 정보를 두 번 세지 않게)
+#  - 서비스 비율 = 몇 대가 받았나(중복 제외), 총 수신량 = 몇 번 받았나(중복 포함) → 둘 다 넣음
+#  - 유효 수신량은 서비스 비율 × 상수라 제외, 중복도는 총수신/유효 라 제외, PDR은 총수신/(K×생성량×차량수)라 제외 (표에는 표시)
+MET = [("Service_Ratio", "서비스 비율(%)", 1), ("Total_Received", "총 수신량", 1),
        ("Jain_RSU", "Jain RSU", 1), ("Jain_Vehicle", "Jain 차량", 1), ("RSSI_Mean_dBm", "RSSI(dBm)", 1),
        ("PER", "PER(%)", -1), ("Collisions", "충돌 수", -1), ("Channel_Busy", "채널 점유율(%)", -1)]
 TIME = ("Time_s", "계산 시간(s)", -1)
-EN = {"GA-연속그룹 (기존 연산)": "Continuous group-GA (old operators)", "Grid top-K": "Grid top-K", "Greedy-교차로": "Greedy-intersection", "Greedy-전체교차로": "Greedy-all junctions",
-      "GA-집합 (도로점)": "Set-GA", "GA-연속그룹": "Continuous group-GA", "PPO": "PPO", "DQN": "DQN", "최적해(ILP)": "ILP (optimal)"}
-COL = {"GA-연속그룹 (기존 연산)": "#f3d27a", "Grid top-K": "#8d8c86", "Greedy-교차로": "#2a6fdb", "Greedy-전체교차로": "#1b998b", "GA-집합 (도로점)": "#eb6834",
+EXCLUDE = {"GA-집합 (도로점)"}   # 이번 비교에서 제외 (--include-all 로 포함)
+EN = {"GA-연속그룹 v3": "Continuous group-GA v3 (proposed)", "GA-연속그룹 (기존 연산)": "Continuous group-GA v1 (old operators)", "Grid top-K": "Grid top-K", "Greedy-교차로": "Greedy-intersection", "Greedy-전체교차로": "Greedy-all junctions",
+      "GA-집합 (도로점)": "Set-GA", "GA-연속그룹": "Continuous group-GA v2", "PPO": "PPO", "DQN": "DQN", "최적해(ILP)": "ILP (optimal)"}
+COL = {"GA-연속그룹 v3": "#ff7f0e", "GA-연속그룹 (기존 연산)": "#f3d27a", "Grid top-K": "#8d8c86", "Greedy-교차로": "#2a6fdb", "Greedy-전체교차로": "#1b998b", "GA-집합 (도로점)": "#eb6834",
        "GA-연속그룹": "#e3a008", "PPO": "#8e44ad", "DQN": "#c0392b", "최적해(ILP)": "#0b0b0b"}
 PAT = {"P1": "Erlangen P1 random", "P2": "Erlangen P2 downtown", "P3": "Erlangen P3 arterial",
        "DA_P1": "Darmstadt P1 random", "DA_P2": "Darmstadt P2 downtown", "DA_P3": "Darmstadt P3 arterial",
@@ -101,8 +105,12 @@ def topsis(block, mets):
 
 
 def main():
+    if "--include-all" in sys.argv:
+        EXCLUDE.clear()
     os.makedirs(AN, exist_ok=True)
     S, raw, T = load()
+    S = S[~S.Method.isin(EXCLUDE)]
+    T = T[~T.Method.isin(EXCLUDE)]
     methods = [m for m in EN if m in set(S.Method)]
     pats = sorted(S.Pattern.unique())
 
@@ -163,7 +171,7 @@ def main():
     fig, ax = plt.subplots(figsize=(1.1 * len(methods) + 3, 0.45 * len(A) + 1.5))
     im = ax.imshow(A.to_numpy(float), cmap="RdYlGn_r", aspect="auto")
     ax.set_xticks(range(len(methods))); ax.set_xticklabels([EN[m] for m in methods], rotation=30, ha="right", fontsize=8)
-    lab_en = ["Service ratio", "+PDR", "+Total received", "+Jain RSU", "+Jain vehicle", "+RSSI", "+PER", "+Collisions",
+    lab_en = ["Service ratio", "+Total received", "+Jain RSU", "+Jain vehicle", "+RSSI", "+PER", "+Collisions",
               "+Channel busy", "+Computation time"]
     ax.set_yticks(range(len(A))); ax.set_yticklabels(lab_en[:len(A)], fontsize=8)
     for i in range(A.shape[0]):

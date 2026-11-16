@@ -36,11 +36,12 @@ from rsu_lib import scenario as SC  # noqa: E402
 
 OUT = os.path.join("experiment_results", "step5")
 RAW = os.path.join(OUT, "step5_verify_raw.csv")
-DEFAULT_METHODS = ("Grid top-K,Greedy-교차로,Greedy-전체교차로,GA-집합 (도로점),GA-연속그룹,GA-연속그룹 (기존 연산),PPO,DQN,최적해(ILP)")
+DEFAULT_METHODS = ("Grid top-K,Greedy-교차로,Greedy-전체교차로,GA-연속그룹 v3,GA-연속그룹,GA-연속그룹 (기존 연산),PPO,DQN,최적해(ILP)")  # 집합 GA 제외
 COLS = ["Key", "Pattern", "Methods", "K", "Rep", "Seed", "Coords", "Pred_Cover", "Success", "Elapsed_Sec", "PDR",
         "Service_Ratio", "Total_Received", "Jain_RSU", "Jain_Vehicle", "PER", "Collisions", "RSSI_Mean_dBm",
-        "SNR_Mean_dB", "Channel_Busy", "RXTX_Lost", "Metrics_OK", "Error"]
-METRICS = ["Service_Ratio", "PDR", "Total_Received", "Jain_RSU", "Jain_Vehicle", "RSSI_Mean_dBm", "PER",
+        "SNR_Mean_dB", "Channel_Busy", "RXTX_Lost", "Metrics_OK", "Error", "Effective_Received", "Alive_Slots"]
+ALIVE_SLOTS_APPROX = 93784   # 예전 run(유효 수신량 기록 전): 47대 × (200초 − 출발시각) / 0.1초
+METRICS = ["Service_Ratio", "Effective_Received", "Duplication", "PDR", "Total_Received", "Jain_RSU", "Jain_Vehicle", "RSSI_Mean_dBm", "PER",
            "Collisions", "Channel_Busy", "Elapsed_Sec"]
 T95 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8: 2.306, 9: 2.262, 10: 2.228}
 
@@ -62,9 +63,35 @@ def place_key(p, K, coords):
     return f"{p}|K{K}|" + json.dumps(sorted([[round(x, 1), round(y, 1)] for x, y in coords]))
 
 
+def migrate_raw():
+    """예전 raw(유효 수신량 열 없음) → 새 열 추가. 예전 run의 유효 수신량은 서비스 비율 × 차량-칸 수로 복원"""
+    if not os.path.exists(RAW):
+        return
+    old = pd.read_csv(RAW)
+    if all(c in old.columns for c in COLS):
+        return
+    for c in COLS:
+        if c not in old.columns:
+            old[c] = np.nan
+    old[COLS].to_csv(RAW, index=False)
+    print(f"raw 열 갱신: {RAW}")
+
+
+def add_derived(raw):
+    raw = raw.copy()
+    for c in ("Effective_Received", "Alive_Slots"):
+        if c not in raw.columns:
+            raw[c] = np.nan
+    alive = raw.Alive_Slots.where(raw.Alive_Slots.notna(), ALIVE_SLOTS_APPROX)
+    eff = raw.Effective_Received.where(raw.Effective_Received.notna(), raw.Service_Ratio / 100 * alive)
+    raw["Effective_Received"] = eff
+    raw["Duplication"] = raw.Total_Received / eff.where(eff > 0)
+    return raw
+
+
 def summarize(pats):
     """방법 이름은 현재 placements.csv 기준으로 붙임 (다시 돌린 방법의 옛 결과가 섞이지 않게)"""
-    raw = pd.read_csv(RAW)
+    raw = add_derived(pd.read_csv(RAW))
     raw = raw[raw.Success.astype(str) == "True"]
     owners = {}
     for p in pats:
@@ -134,6 +161,7 @@ def main():
                 socket.create_connection(("localhost", 9999), timeout=3).close()
             except OSError:
                 sys.exit("veins_launchd(localhost:9999)가 안 떠 있어요. 먼저 띄운 뒤 다시 실행하세요.")
+        migrate_raw()
         done = set()
         if os.path.exists(RAW):
             old = pd.read_csv(RAW)

@@ -6,7 +6,9 @@ rsu_lib/metrics.py
 (C++ 계측: src/veins/modules/application/traci/TraCIDemo11p.cc 의 [metrics] 블록)
 
   PDR(%)                 기존 정의 그대로: ΣRx / (ΣGen_RSU × N)      ← 기존 결과와 비교 가능
-  Total_Received         ΣRx (차량들이 받은 BSM 총량)
+  Total_Received         ΣRx (차량들이 받은 BSM 총량, 같은 순간 여러 RSU에게서 받으면 모두 셈 = 중복 포함)
+  Effective_Received     Σ uniqueRxSlots (BSM을 1개 이상 받은 차량-0.1초 칸 수 = 중복 제외 수신량)
+  Alive_Slots            Σ (aliveTime / 0.1)  (차량-0.1초 칸 전체 수, 서비스 비율의 분모)
   Service_Ratio(%)       차량 관점 서비스율: 0.1초 슬롯 중 BSM을 ≥1개 받은 슬롯 비율
                          = Σ uniqueRxSlots / Σ (aliveTime / 0.1)
                          → K가 늘수록 "덮이는 시간"이 늘면 증가 (희석 없음)
@@ -100,7 +102,7 @@ def parse_metrics(sca_path, rsu_coords=None):
     nan = float("nan")
     res = {
         "PDR": 0.0, "Total_Generated": 0, "Num_Vehicles": 0, "Num_RSUs": 0,
-        "Total_Received": 0, "Service_Ratio": nan, "Jain_RSU": nan, "Jain_Vehicle": nan,
+        "Total_Received": 0, "Effective_Received": nan, "Alive_Slots": nan, "Service_Ratio": nan, "Jain_RSU": nan, "Jain_Vehicle": nan,
         "PER": nan, "Collisions": 0, "RXTX_Lost": 0, "RSSI_Mean_dBm": nan, "SNR_Mean_dB": nan,
         "Channel_Busy": nan, "PerRSU_Rx": "[]", "PerRSU_Source": "none", "Metrics_OK": False,
     }
@@ -154,6 +156,8 @@ def parse_metrics(sca_path, rsu_coords=None):
         slots = sum(d.get("metricUniqueRxSlots", 0) for d in vehicles)
         alive_slots = sum(d.get("metricAliveTime", 0) / SLOT_SEC for d in vehicles)
         res["Service_Ratio"] = round(slots / alive_slots * 100, 4) if alive_slots > 0 else nan
+        res["Effective_Received"] = int(slots)
+        res["Alive_Slots"] = int(round(alive_slots))
 
         pos, mac = {}, {}
         for d in vehicles:
