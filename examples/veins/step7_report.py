@@ -27,7 +27,7 @@ import step5_analyze as SA  # noqa: E402
 
 OUT, AN = SA.OUT, SA.AN
 LBL = {"Greedy-교차로": "교차로 정보 기반 (algo1 수정)", "Greedy-전체교차로": "밀도 스냅샷 기반 (algo7 수정)",
-       "GA-연속그룹 v3": "**연속 GA v3 (제안)**", "GA-연속그룹": "연속 GA v2", "GA-연속그룹 (기존 연산)": "연속 GA v1 (기존 연산)",
+       "GA-연속그룹 v3": "**연속 GA v3 (제안)**", "GA-그룹 (교차점)": "GA (제안, 교차점 후보 = 최적해와 같은 조건)", "GA-연속그룹": "연속 GA v2", "GA-연속그룹 (기존 연산)": "연속 GA v1 (기존 연산)",
        "PPO": "PPO", "DQN": "DQN", "최적해(ILP)": "최적해 (전수조사 = ILP)", "Grid top-K": "격자 top-K",
        "GA-집합 (도로점)": "집합 GA"}
 ORDER = list(LBL)
@@ -72,7 +72,8 @@ def main():
     R.to_csv(os.path.join(AN, "report_ranks.csv"), index=False, encoding="utf-8-sig")
     doc = ["# 실험 결과 정리 (자동 생성: step7_report.py)", "",
            "- 값: 5회 반복 평균 ± 표준편차. 순위는 K마다 매긴 순위를 K=1~10 평균 (낮을수록 좋음)",
-           "- 서비스만 = 서비스 비율 순위 / 모든 지표 = 서비스·총수신·Jain RSU·Jain 차량·RSSI·PER·충돌·채널점유율 / +시간 = 여기에 계산 시간 추가",
+           "- 서비스만 = 서비스 비율 순위 / 모든 지표 = 서비스·총수신·Jain RSU·Jain 차량 / +시간 = 여기에 계산 시간 추가",
+           "- RSSI·PER·충돌·채널 점유율은 표에만 표시하고 순위에서 제외: PER·충돌·점유율은 모든 방법이 거의 0이라 차이가 무의미하고, RSSI는 성공 수신만 평균이라 넓게 덮을수록 낮아지는 편향이 있음 (아래 '지표별 방법 간 차이 크기' 참고)",
            "- 유효 수신량 = BSM을 1개 이상 받은 차량-0.1초 칸 수(중복 제외), 총 수신량 = 받은 BSM 전부(중복 포함), 중복도 = 총 ÷ 유효", ""]
     pats = sorted(S.Pattern.unique(), key=lambda p: (list(MAPS.values()).index(mapof(p)), p))
     for mp in [m for m in MAPS.values() if any(mapof(p) == m for p in pats)]:
@@ -130,6 +131,16 @@ def main():
             oc = pd.concat(oc)
             doc += [f"### {mp} 최적해 검증 (교차점 후보, 근사 모델 커버 %)", "",
                     mdtab(oc.assign(일치=oc.Same.map({True: "같음", False: "–"}))[["Pattern", "K", "ILP_cover", "BF_cover", "BF_finished", "BF_s", "일치"]]), ""]
+    # 지표별 방법 간 차이 크기 (순위에서 뺀 이유의 근거)
+    rows = []
+    for k, lab, unit in (("Service_Ratio", "서비스 비율", "%p"), ("Total_Received", "총 수신량", "개"), ("Jain_Vehicle", "Jain 차량", ""),
+                         ("RSSI_Mean_dBm", "RSSI", "dB"), ("PER", "PER", "%p"), ("Collisions", "충돌 수", "회/200초"),
+                         ("Channel_Busy", "채널 점유율", "%p")):
+        g = S.groupby(["Pattern", "K"])[k + "_mean"]
+        sp = (g.max() - g.min()).mean()
+        rows.append(dict(지표=lab, 방법간_최대최소차이_평균=f"{sp:,.4g} {unit}", 값의_범위=f"{S[k + '_mean'].min():,.4g} ~ {S[k + '_mean'].max():,.4g}",
+                         순위반영="O" if k in [m for m, _, _ in SA.MET] else "X (표에만)"))
+    doc += ["## 지표별 방법 간 차이 크기 (같은 K 안에서)", "", mdtab(pd.DataFrame(rows)), ""]
     # GA 버전 비교
     doc += ["## GA 버전 비교", ""]
     rows = []
@@ -141,7 +152,7 @@ def main():
                          K1_PDR=round(g4.PDR.max(), 2), 평균서비스="–", 서비스만순위="–",
                          K당시간=f"약 {len(g4) * sim_k1:.0f}s (시뮬 {len(g4)}회 × {sim_k1:.0f}s)"))
     for m, lab in (("GA-연속그룹 (기존 연산)", "② v1 (좌표 평균 교차)"), ("GA-연속그룹", "③ v2 (RSU 단위 교차, 매번 계산)"),
-                   ("GA-연속그룹 v3", "④ v3 (제안, 커버 지도 미리 계산)")):
+                   ("GA-연속그룹 v3", "④ v3 (제안, 커버 지도 미리 계산)"), ("GA-그룹 (교차점)", "④' v3 같은 GA, 교차점 후보")):
         d = S[S.Method == m]
         if d.empty:
             continue

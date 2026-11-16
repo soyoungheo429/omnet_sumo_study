@@ -150,6 +150,10 @@ def run_pattern(p, a):
     for K, X, sec in rows3:
         add(V3, K, X, sec)
     timing.append(dict(Method=V3, Prep_s=tp, Train_s=0))
+    # 4c) 같은 GA, 교차점 후보 (최적해와 같은 조건)
+    for K, X, sec in ga_junction(B, S, a):
+        add(V3J, K, X, sec)
+    timing.append(dict(Method=V3J, Prep_s=secs["B"], Train_s=0))
     # 5) 연속 그룹 GA (격자·후보 없음, 개체 = K개 연속 좌표, 첫 세대는 차량 위치에서)
     if a.cga_ks:
         for K, X, sec in cga(S, a):
@@ -187,6 +191,25 @@ def run_pattern(p, a):
 
 
 V3 = "GA-연속그룹 v3"
+V3J = "GA-그룹 (교차점)"   # 같은 GA를 최적해와 같은 후보(교차점)에서: 공정 비교용
+
+
+def ga_junction(B, S, a):
+    """GA v3와 같은 연산·예산, 후보만 교차점(최적해·Greedy·RL과 동일)"""
+    from rsu_lib.lattice_ga import CoverLattice, LatticeGA
+    cl = CoverLattice.from_matrix(B)
+    rows = []
+    for K in KS:
+        t = time.perf_counter(); best = None
+        for run in range(a.cga3_runs):
+            X, f, _ = LatticeGA(cl, K, pop=a.cga3_pop, gens=a.cga3_gens, seed=run, init_pts=S.pts,
+                                sigma_min=cl.spacing).run()
+            if best is None or f > best[1]:
+                best = (X, f)
+        sec = time.perf_counter() - t
+        print(f"  GA (교차점) K={K}: {best[1]:.2f}%  {sec:.1f}s", flush=True)
+        rows.append((K, best[0], sec))
+    return rows
 
 
 def cga3(S, F, pdir, a):
@@ -240,6 +263,15 @@ def rerun_only(S, F, p, pdir, a, cms, secs):
                             Pred_Cover=round(S.cover_pct([tuple(q) for q in c]), 2), Time_K_s=round(sec, 4)))
         P = pd.concat([P, pd.DataFrame(new)], ignore_index=True)
         T = pd.concat([T, pd.DataFrame([dict(Method=V3, Prep_s=tp, Train_s=0)])], ignore_index=True)
+    if "v3j" in todo:
+        P, T = P[P.Method != V3J], T[T.Method != V3J]
+        new = []
+        for K, X, sec in ga_junction(cms["B"], S, a):
+            c = [[round(float(x), 2), round(float(y), 2)] for x, y in X]
+            new.append(dict(Pattern=p, Method=V3J, K=K, Coords=json.dumps(c),
+                            Pred_Cover=round(S.cover_pct([tuple(q) for q in c]), 2), Time_K_s=round(sec, 4)))
+        P = pd.concat([P, pd.DataFrame(new)], ignore_index=True)
+        T = pd.concat([T, pd.DataFrame([dict(Method=V3J, Prep_s=secs["B"], Train_s=0)])], ignore_index=True)
     if "bf" in todo:
         bf_check(cms["B"], p, pdir, a)
     save(S, P, T, p, pdir)
@@ -291,9 +323,9 @@ def save(S, P, T, p, pdir):
     print(T[["Method", "Prep_s", "Train_s", "Sum_K_s", "Total_s"]].round(2).to_string(index=False))
 
 
-EN = {"GA-연속그룹 v3": "Continuous group-GA v3 (proposed)", "GA-연속그룹 (기존 연산)": "Continuous group-GA v1 (old operators)", "Grid top-K": "Grid top-K", "Greedy-교차로": "Greedy-intersection", "Greedy-전체교차로": "Greedy-all junctions",
+EN = {"GA-그룹 (교차점)": "Group-GA (junction candidates)", "GA-연속그룹 v3": "Continuous group-GA v3 (proposed)", "GA-연속그룹 (기존 연산)": "Continuous group-GA v1 (old operators)", "Grid top-K": "Grid top-K", "Greedy-교차로": "Greedy-intersection", "Greedy-전체교차로": "Greedy-all junctions",
       "GA-집합 (도로점)": "Set-GA", "GA-연속그룹": "Continuous group-GA v2", "PPO": "PPO", "DQN": "DQN", "최적해(ILP)": "ILP (optimal)"}
-COL = {"GA-연속그룹 v3": "#ff7f0e", "GA-연속그룹 (기존 연산)": "#f3d27a", "Grid top-K": "#8d8c86", "Greedy-교차로": "#2a6fdb", "Greedy-전체교차로": "#1b998b", "GA-집합 (도로점)": "#eb6834",
+COL = {"GA-그룹 (교차점)": "#d4a017", "GA-연속그룹 v3": "#ff7f0e", "GA-연속그룹 (기존 연산)": "#f3d27a", "Grid top-K": "#8d8c86", "Greedy-교차로": "#2a6fdb", "Greedy-전체교차로": "#1b998b", "GA-집합 (도로점)": "#eb6834",
        "GA-연속그룹": "#e3a008", "PPO": "#8e44ad", "DQN": "#c0392b", "최적해(ILP)": "#0b0b0b"}
 
 
@@ -345,13 +377,13 @@ def main():
     ap.add_argument("--road-step", type=float, default=25.0, help="집합 GA 도로 위 후보점 간격(m). 큰 지도는 50")
     ap.add_argument("--cga-ks", default="", help="연속 GA v2 돌릴 K (기본 생략, 예: 1,2,...,10)")
     ap.add_argument("--with-setga", action="store_true", help="집합 GA도 실행 (기본 제외)")
-    ap.add_argument("--only", default="", help="일부만 다시 돌려 기존 결과에 반영: v3 (연속 GA v3), bf (최적해 전수조사 검증). 예: --only v3,bf")
+    ap.add_argument("--only", default="", help="일부만 다시 돌려 기존 결과에 반영: v3 (연속 GA v3), v3j (같은 GA, 교차점 후보), bf (최적해 전수조사 검증). 예: --only v3j")
     ap.add_argument("--lat-step", type=float, default=5.0, help="v3 커버 지도 간격(m)")
     ap.add_argument("--lat-buffer", type=float, default=30.0, help="v3 커버 지도 범위: 도로 양옆(m)")
     ap.add_argument("--workers", type=int, default=0, help="커버 지도 병렬 계산 프로세스 수 (0 = CPU 전부)")
     ap.add_argument("--cga3-pop", type=int, default=50)
     ap.add_argument("--cga3-gens", type=int, default=150)
-    ap.add_argument("--cga3-runs", type=int, default=2)
+    ap.add_argument("--cga3-runs", type=int, default=6, help="GA 반복 실행 횟수 (가장 좋은 결과 사용)")
     ap.add_argument("--bf-max-k", type=int, default=5, help="전수조사로 검증할 최대 K (그 위는 ILP만)")
     ap.add_argument("--bf-time", type=int, default=600, help="K 하나 전수조사 시간 제한(초)")
     ap.add_argument("--cga-init", default="vehicles", choices=["vehicles", "uniform"],

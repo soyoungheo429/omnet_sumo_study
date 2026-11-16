@@ -36,7 +36,7 @@ from rsu_lib import scenario as SC  # noqa: E402
 
 OUT = os.path.join("experiment_results", "step5")
 RAW = os.path.join(OUT, "step5_verify_raw.csv")
-DEFAULT_METHODS = ("Grid top-K,Greedy-교차로,Greedy-전체교차로,GA-연속그룹 v3,GA-연속그룹,GA-연속그룹 (기존 연산),PPO,DQN,최적해(ILP)")  # 집합 GA 제외
+DEFAULT_METHODS = ("Grid top-K,Greedy-교차로,Greedy-전체교차로,GA-연속그룹 v3,GA-그룹 (교차점),GA-연속그룹,GA-연속그룹 (기존 연산),PPO,DQN,최적해(ILP)")  # 집합 GA 제외
 COLS = ["Key", "Pattern", "Methods", "K", "Rep", "Seed", "Coords", "Pred_Cover", "Success", "Elapsed_Sec", "PDR",
         "Service_Ratio", "Total_Received", "Jain_RSU", "Jain_Vehicle", "PER", "Collisions", "RSSI_Mean_dBm",
         "SNR_Mean_dB", "Channel_Busy", "RXTX_Lost", "Metrics_OK", "Error", "Effective_Received", "Alive_Slots"]

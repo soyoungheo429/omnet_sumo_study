@@ -70,6 +70,20 @@ class CoverLattice:
         self.tree = cKDTree(self.coords)
         self.lo, self.hi = self.coords.min(0), self.coords.max(0)
 
+    @classmethod
+    def from_matrix(cls, cm):
+        """이미 계산된 후보 커버리지 행렬(예: 교차점 195곳)로 '후보 = 그 지점들'인 지도 만들기 → 같은 후보에서 최적해와 공정 비교용"""
+        o = cls.__new__(cls)
+        o.S, o.step, o.buffer, o.prep_s = None, None, None, 0.0
+        o.coords = np.asarray(cm.coords, float)
+        o.packed = np.packbits(cm.M, axis=1)
+        o.n_pts = cm.M.shape[1]
+        o.tree = cKDTree(o.coords)
+        o.lo, o.hi = o.coords.min(0), o.coords.max(0)
+        d, _ = o.tree.query(o.coords, k=2)
+        o.spacing = float(np.median(d[:, 1]))     # 후보 간 보통 간격 → 돌연변이 최소 폭 (이보다 작으면 다른 후보로 못 옮김)
+        return o
+
     def snap(self, X):
         """연속 좌표 (K,2) → 가장 가까운 칸 번호와 그 칸 좌표"""
         _, idx = self.tree.query(X)

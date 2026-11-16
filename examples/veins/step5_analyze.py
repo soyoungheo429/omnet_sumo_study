@@ -40,14 +40,18 @@ AN = os.path.join(OUT, "analysis")
 # 종합 점수에 쓰는 지표 (지표 재설계: 서로 같은 정보를 두 번 세지 않게)
 #  - 서비스 비율 = 몇 대가 받았나(중복 제외), 총 수신량 = 몇 번 받았나(중복 포함) → 둘 다 넣음
 #  - 유효 수신량은 서비스 비율 × 상수라 제외, 중복도는 총수신/유효 라 제외, PDR은 총수신/(K×생성량×차량수)라 제외 (표에는 표시)
+#  - PER·충돌·채널 점유율: 모든 방법이 거의 0 (방법 간 차이 PER 0.004%p, 충돌 1회/200초, 점유율 0.05%p)
+#    → 0~1 정규화하면 무의미한 차이가 서비스 비율과 같은 무게가 되므로 순위에서 제외 (표에는 표시)
+#  - RSSI: 성공 수신만 평균 → 먼 차량까지 덮을수록 낮아지는 편향 → 순위에서 제외 (표에는 표시)
 MET = [("Service_Ratio", "서비스 비율(%)", 1), ("Total_Received", "총 수신량", 1),
-       ("Jain_RSU", "Jain RSU", 1), ("Jain_Vehicle", "Jain 차량", 1), ("RSSI_Mean_dBm", "RSSI(dBm)", 1),
-       ("PER", "PER(%)", -1), ("Collisions", "충돌 수", -1), ("Channel_Busy", "채널 점유율(%)", -1)]
+       ("Jain_RSU", "Jain RSU", 1), ("Jain_Vehicle", "Jain 차량", 1)]
+MET_INFO = [("RSSI_Mean_dBm", "RSSI(dBm)", 1), ("PER", "PER(%)", -1), ("Collisions", "충돌 수", -1),
+            ("Channel_Busy", "채널 점유율(%)", -1)]   # 표에만
 TIME = ("Time_s", "계산 시간(s)", -1)
 EXCLUDE = {"GA-집합 (도로점)"}   # 이번 비교에서 제외 (--include-all 로 포함)
-EN = {"GA-연속그룹 v3": "Continuous group-GA v3 (proposed)", "GA-연속그룹 (기존 연산)": "Continuous group-GA v1 (old operators)", "Grid top-K": "Grid top-K", "Greedy-교차로": "Greedy-intersection", "Greedy-전체교차로": "Greedy-all junctions",
+EN = {"GA-그룹 (교차점)": "Group-GA (junction candidates)", "GA-연속그룹 v3": "Continuous group-GA v3 (proposed)", "GA-연속그룹 (기존 연산)": "Continuous group-GA v1 (old operators)", "Grid top-K": "Grid top-K", "Greedy-교차로": "Greedy-intersection", "Greedy-전체교차로": "Greedy-all junctions",
       "GA-집합 (도로점)": "Set-GA", "GA-연속그룹": "Continuous group-GA v2", "PPO": "PPO", "DQN": "DQN", "최적해(ILP)": "ILP (optimal)"}
-COL = {"GA-연속그룹 v3": "#ff7f0e", "GA-연속그룹 (기존 연산)": "#f3d27a", "Grid top-K": "#8d8c86", "Greedy-교차로": "#2a6fdb", "Greedy-전체교차로": "#1b998b", "GA-집합 (도로점)": "#eb6834",
+COL = {"GA-그룹 (교차점)": "#d4a017", "GA-연속그룹 v3": "#ff7f0e", "GA-연속그룹 (기존 연산)": "#f3d27a", "Grid top-K": "#8d8c86", "Greedy-교차로": "#2a6fdb", "Greedy-전체교차로": "#1b998b", "GA-집합 (도로점)": "#eb6834",
        "GA-연속그룹": "#e3a008", "PPO": "#8e44ad", "DQN": "#c0392b", "최적해(ILP)": "#0b0b0b"}
 PAT = {"P1": "Erlangen P1 random", "P2": "Erlangen P2 downtown", "P3": "Erlangen P3 arterial",
        "DA_P1": "Darmstadt P1 random", "DA_P2": "Darmstadt P2 downtown", "DA_P3": "Darmstadt P3 arterial",
@@ -118,7 +122,7 @@ def main():
     rows = []
     for r in S.sort_values(["Pattern", "K", "Method"]).itertuples():
         d = {"패턴": r.Pattern, "K": r.K, "방법": r.Method, "n": r.n}
-        for m, lab, _ in MET:
+        for m, lab, _ in MET + MET_INFO:
             mu, sd = getattr(r, f"{m}_mean"), getattr(r, f"{m}_std")
             dec = 0 if m in ("Total_Received", "Collisions") else (3 if m.startswith("Jain") or m == "PER" else 2)
             d[lab] = f"{mu:.{dec}f} ± {sd:.{dec}f}"
@@ -171,7 +175,7 @@ def main():
     fig, ax = plt.subplots(figsize=(1.1 * len(methods) + 3, 0.45 * len(A) + 1.5))
     im = ax.imshow(A.to_numpy(float), cmap="RdYlGn_r", aspect="auto")
     ax.set_xticks(range(len(methods))); ax.set_xticklabels([EN[m] for m in methods], rotation=30, ha="right", fontsize=8)
-    lab_en = ["Service ratio", "+Total received", "+Jain RSU", "+Jain vehicle", "+RSSI", "+PER", "+Collisions",
+    lab_en = ["Service ratio", "+Total received", "+Jain RSU", "+Jain vehicle",
               "+Channel busy", "+Computation time"]
     ax.set_yticks(range(len(A))); ax.set_yticklabels(lab_en[:len(A)], fontsize=8)
     for i in range(A.shape[0]):
@@ -266,7 +270,7 @@ def main():
     plt.tight_layout(); plt.savefig(os.path.join(AN, "fig_service_by_pattern.png"), dpi=150); plt.close()
     for p in pats:
         fig, axs = plt.subplots(3, 3, figsize=(15, 11))
-        for ax, (m_key, _, _) in zip(axs.ravel(), MET):
+        for ax, (m_key, _, _) in zip(axs.ravel(), MET + MET_INFO):
             for m in methods:
                 s = S[(S.Pattern == p) & (S.Method == m)].sort_values("K")
                 ax.errorbar(s.K, s[f"{m_key}_mean"], yerr=s[f"{m_key}_std"], marker="o", ms=3, lw=1.3, capsize=2,
