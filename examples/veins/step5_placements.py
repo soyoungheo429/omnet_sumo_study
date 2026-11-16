@@ -73,13 +73,14 @@ def grid_points(net, R, step=150.0, near=100.0):
 def build(S, pdir, F, force=False, road_step=25.0, need_R=True):
     cand = {"A": [(x, y) for _, x, y in CA.intersections(F["net"])],
             "B": [(x, y) for _, x, y in CA.all_junctions(F["net"])]}
+    road = [tuple(p) for p in CA.road_points(F["net"], road_step)]
     if need_R:
-        cand["R"] = [tuple(p) for p in CA.road_points(F["net"], road_step)]
+        cand["R"] = road
     if F["grid"]:
         g = pd.read_csv(F["grid"], encoding="utf-8-sig")
         cand["G"] = list(zip(g.Sim_X, g.Sim_Y))
     else:
-        cand["G"] = grid_points(F["net"], cand["R"])
+        cand["G"] = grid_points(F["net"], road)
     cache = os.path.join(pdir, "_coverage_cache.npz")
     if os.path.exists(cache) and not force:
         z = np.load(cache)
