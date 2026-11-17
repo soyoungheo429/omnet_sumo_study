@@ -37,13 +37,13 @@ P1,5,Greedy-전체교차로,Greedy-교차로,5,0.0,1.0,False
 P1,5,Greedy-전체교차로,Grid top-K,5,39.294,0.0,True
 P1,5,Greedy-전체교차로,PPO,5,0.0,1.0,False
 P1,5,Greedy-전체교차로,최적해(ILP),5,0.0,1.0,False
-P1,6,Greedy-전체교차로,DQN,5,0.0,1.0,False
-P1,6,Greedy-전체교차로,GA-연속그룹,5,0.7287,0.0,True
-P1,6,Greedy-전체교차로,GA-연속그룹 v3,5,-4.5524,0.0,True
-P1,6,Greedy-전체교차로,Greedy-교차로,5,0.2216,0.0051,True
-P1,6,Greedy-전체교차로,Grid top-K,5,25.6742,0.0,True
-P1,6,Greedy-전체교차로,PPO,5,0.0,1.0,False
-P1,6,Greedy-전체교차로,최적해(ILP),5,0.0,1.0,False
+P1,6,Grid top-K,DQN,5,-25.6742,0.0,True
+P1,6,Grid top-K,GA-연속그룹,5,-24.9455,0.0,True
+P1,6,Grid top-K,GA-연속그룹 v3,5,-30.2267,0.0,True
+P1,6,Grid top-K,Greedy-교차로,5,-25.4526,0.0,True
+P1,6,Grid top-K,Greedy-전체교차로,5,-25.6742,0.0,True
+P1,6,Grid top-K,PPO,5,-25.6742,0.0,True
+P1,6,Grid top-K,최적해(ILP),5,-25.6742,0.0,True
 P1,7,Greedy-전체교차로,DQN,5,0.0,1.0,False
 P1,7,Greedy-전체교차로,GA-연속그룹,5,-0.5778,0.0003,True
 P1,7,Greedy-전체교차로,GA-연속그룹 v3,5,1.4759,0.0,True
@@ -51,14 +51,14 @@ P1,7,Greedy-전체교차로,Greedy-교차로,5,0.2697,0.014,True
 P1,7,Greedy-전체교차로,Grid top-K,5,23.4754,0.0,True
 P1,7,Greedy-전체교차로,PPO,5,0.0,1.0,False
 P1,7,Greedy-전체교차로,최적해(ILP),5,0.0,1.0,False
-P1,8,PPO,DQN,5,0.6852,0.0,True
-P1,8,PPO,GA-연속그룹,5,4.7139,0.0,True
-P1,8,PPO,GA-연속그룹 (기존 연산),5,16.3636,0.0,True
-P1,8,PPO,GA-연속그룹 v3,5,-2.8335,0.0,True
-P1,8,PPO,Greedy-교차로,5,0.041,0.4649,False
-P1,8,PPO,Greedy-전체교차로,5,-0.1483,0.0222,True
-P1,8,PPO,Grid top-K,5,22.5547,0.0,True
-P1,8,PPO,최적해(ILP),5,-0.8728,0.0,True
+P1,8,최적해(ILP),DQN,5,1.558,0.0,True
+P1,8,최적해(ILP),GA-연속그룹,5,5.5867,0.0,True
+P1,8,최적해(ILP),GA-연속그룹 (기존 연산),5,17.2364,0.0,True
+P1,8,최적해(ILP),GA-연속그룹 v3,5,-1.9607,0.0,True
+P1,8,최적해(ILP),Greedy-교차로,5,0.9138,0.0,True
+P1,8,최적해(ILP),Greedy-전체교차로,5,0.7245,0.0,True
+P1,8,최적해(ILP),Grid top-K,5,23.4275,0.0,True
+P1,8,최적해(ILP),PPO,5,0.8728,0.0,True
 P1,9,Greedy-전체교차로,DQN,5,-0.4884,0.0,True
 P1,9,Greedy-전체교차로,GA-연속그룹,5,8.1661,0.0,True
 P1,9,Greedy-전체교차로,GA-연속그룹 v3,5,-0.8731,0.0,True
@@ -66,22 +66,22 @@ P1,9,Greedy-전체교차로,Greedy-교차로,5,0.2706,0.0,True
 P1,9,Greedy-전체교차로,Grid top-K,5,24.9045,0.0,True
 P1,9,Greedy-전체교차로,PPO,5,0.6468,0.0002,True
 P1,9,Greedy-전체교차로,최적해(ILP),5,0.1185,0.0,True
-P1,10,Greedy-전체교차로,DQN,5,-0.5134,0.0,True
-P1,10,Greedy-전체교차로,GA-연속그룹,5,5.1225,0.0,True
-P1,10,Greedy-전체교차로,GA-연속그룹 (기존 연산),5,15.4062,0.0,True
-P1,10,Greedy-전체교차로,GA-연속그룹 v3,5,-0.105,0.0,True
-P1,10,Greedy-전체교차로,Greedy-교차로,5,0.1487,0.0,True
-P1,10,Greedy-전체교차로,Grid top-K,5,26.6397,0.0,True
-P1,10,Greedy-전체교차로,PPO,5,0.8183,0.0002,True
-P1,10,Greedy-전체교차로,최적해(ILP),5,-0.5077,0.0,True
-P2,1,Greedy-전체교차로,DQN,5,0.0,1.0,False
-P2,1,Greedy-전체교차로,GA-연속그룹,5,-3.7796,0.0,True
-P2,1,Greedy-전체교차로,GA-연속그룹 (기존 연산),5,-3.7796,0.0,True
-P2,1,Greedy-전체교차로,GA-연속그룹 v3,5,-4.9452,0.0,True
-P2,1,Greedy-전체교차로,Greedy-교차로,5,0.0,1.0,False
-P2,1,Greedy-전체교차로,Grid top-K,5,-3.3575,0.0,True
-P2,1,Greedy-전체교차로,PPO,5,0.0,1.0,False
-P2,1,Greedy-전체교차로,최적해(ILP),5,0.0,1.0,False
+P1,10,최적해(ILP),DQN,5,-0.0057,0.0589,False
+P1,10,최적해(ILP),GA-연속그룹,5,5.6302,0.0,True
+P1,10,최적해(ILP),GA-연속그룹 (기존 연산),5,15.9139,0.0,True
+P1,10,최적해(ILP),GA-연속그룹 v3,5,0.4027,0.0,True
+P1,10,최적해(ILP),Greedy-교차로,5,0.6564,0.0,True
+P1,10,최적해(ILP),Greedy-전체교차로,5,0.5077,0.0,True
+P1,10,최적해(ILP),Grid top-K,5,27.1475,0.0,True
+P1,10,최적해(ILP),PPO,5,1.3261,0.0,True
+P2,1,GA-연속그룹 v3,DQN,5,4.9452,0.0,True
+P2,1,GA-연속그룹 v3,GA-연속그룹,5,1.1656,0.0001,True
+P2,1,GA-연속그룹 v3,GA-연속그룹 (기존 연산),5,1.1656,0.0001,True
+P2,1,GA-연속그룹 v3,Greedy-교차로,5,4.9452,0.0,True
+P2,1,GA-연속그룹 v3,Greedy-전체교차로,5,4.9452,0.0,True
+P2,1,GA-연속그룹 v3,Grid top-K,5,1.5877,0.001,True
+P2,1,GA-연속그룹 v3,PPO,5,4.9452,0.0,True
+P2,1,GA-연속그룹 v3,최적해(ILP),5,4.9452,0.0,True
 P2,2,Greedy-전체교차로,DQN,5,0.0,1.0,False
 P2,2,Greedy-전체교차로,GA-연속그룹,5,-3.0159,0.0,True
 P2,2,Greedy-전체교차로,GA-연속그룹 v3,5,-3.0011,0.0,True
@@ -89,58 +89,58 @@ P2,2,Greedy-전체교차로,Greedy-교차로,5,0.0,1.0,False
 P2,2,Greedy-전체교차로,Grid top-K,5,10.0954,0.0,True
 P2,2,Greedy-전체교차로,PPO,5,0.0,1.0,False
 P2,2,Greedy-전체교차로,최적해(ILP),5,0.0,1.0,False
-P2,3,최적해(ILP),DQN,5,1.6366,0.0,True
-P2,3,최적해(ILP),GA-연속그룹,5,-2.0666,0.0,True
-P2,3,최적해(ILP),GA-연속그룹 (기존 연산),5,-1.5717,0.0088,True
-P2,3,최적해(ILP),GA-연속그룹 v3,5,-4.5,0.0,True
-P2,3,최적해(ILP),Greedy-교차로,5,1.6366,0.0,True
-P2,3,최적해(ILP),Greedy-전체교차로,5,1.6366,0.0,True
-P2,3,최적해(ILP),Grid top-K,5,10.6226,0.0,True
-P2,3,최적해(ILP),PPO,5,1.6366,0.0,True
-P2,4,최적해(ILP),DQN,5,2.7335,0.0,True
-P2,4,최적해(ILP),GA-연속그룹,5,-0.5084,0.0,True
-P2,4,최적해(ILP),GA-연속그룹 v3,5,-2.8426,0.0,True
-P2,4,최적해(ILP),Greedy-교차로,5,2.7335,0.0,True
-P2,4,최적해(ILP),Greedy-전체교차로,5,2.7335,0.0,True
-P2,4,최적해(ILP),Grid top-K,5,23.0702,0.0,True
-P2,4,최적해(ILP),PPO,5,2.7335,0.0,True
-P2,5,최적해(ILP),DQN,5,2.5225,0.0,True
-P2,5,최적해(ILP),GA-연속그룹,5,1.1125,0.0,True
-P2,5,최적해(ILP),GA-연속그룹 (기존 연산),5,4.6613,0.0,True
-P2,5,최적해(ILP),GA-연속그룹 v3,5,-2.7723,0.0,True
-P2,5,최적해(ILP),Greedy-교차로,5,1.5665,0.0,True
-P2,5,최적해(ILP),Greedy-전체교차로,5,2.5225,0.0,True
-P2,5,최적해(ILP),Grid top-K,5,29.8924,0.0,True
-P2,5,최적해(ILP),PPO,5,2.5225,0.0,True
-P2,6,최적해(ILP),DQN,5,1.1547,0.0,True
-P2,6,최적해(ILP),GA-연속그룹,5,2.7893,0.0,True
-P2,6,최적해(ILP),GA-연속그룹 v3,5,-0.9311,0.0,True
-P2,6,최적해(ILP),Greedy-교차로,5,1.8694,0.0,True
-P2,6,최적해(ILP),Greedy-전체교차로,5,2.8242,0.0,True
-P2,6,최적해(ILP),Grid top-K,5,33.4285,0.0,True
-P2,6,최적해(ILP),PPO,5,1.9923,0.0,True
-P2,7,최적해(ILP),DQN,5,3.4296,0.0,True
-P2,7,최적해(ILP),GA-연속그룹,5,5.5229,0.0,True
-P2,7,최적해(ILP),GA-연속그룹 v3,5,-1.9803,0.0,True
-P2,7,최적해(ILP),Greedy-교차로,5,1.6462,0.0,True
-P2,7,최적해(ILP),Greedy-전체교차로,5,2.8376,0.0,True
-P2,7,최적해(ILP),Grid top-K,5,37.2669,0.0,True
-P2,7,최적해(ILP),PPO,5,1.503,0.0,True
-P2,8,최적해(ILP),DQN,5,4.3407,0.0,True
-P2,8,최적해(ILP),GA-연속그룹,5,4.7184,0.0,True
-P2,8,최적해(ILP),GA-연속그룹 (기존 연산),5,12.2762,0.0,True
-P2,8,최적해(ILP),GA-연속그룹 v3,5,-2.2098,0.0,True
-P2,8,최적해(ILP),Greedy-교차로,5,2.6785,0.0,True
-P2,8,최적해(ILP),Greedy-전체교차로,5,1.9219,0.0,True
-P2,8,최적해(ILP),Grid top-K,5,39.6518,0.0,True
-P2,8,최적해(ILP),PPO,5,1.3932,0.0,True
-P2,9,DQN,GA-연속그룹,5,-1.4666,0.0,True
-P2,9,DQN,GA-연속그룹 v3,5,-6.9872,0.0,True
-P2,9,DQN,Greedy-교차로,5,-2.0204,0.0,True
-P2,9,DQN,Greedy-전체교차로,5,-1.6229,0.0,True
-P2,9,DQN,Grid top-K,5,36.3623,0.0,True
-P2,9,DQN,PPO,5,-1.1402,0.0,True
-P2,9,DQN,최적해(ILP),5,-6.1032,0.0,True
+P2,3,Greedy-전체교차로,DQN,5,0.0,1.0,False
+P2,3,Greedy-전체교차로,GA-연속그룹,5,-3.7032,0.0,True
+P2,3,Greedy-전체교차로,GA-연속그룹 (기존 연산),5,-3.2083,0.0006,True
+P2,3,Greedy-전체교차로,GA-연속그룹 v3,5,-6.1366,0.0,True
+P2,3,Greedy-전체교차로,Greedy-교차로,5,0.0,1.0,False
+P2,3,Greedy-전체교차로,Grid top-K,5,8.986,0.0,True
+P2,3,Greedy-전체교차로,PPO,5,0.0,1.0,False
+P2,3,Greedy-전체교차로,최적해(ILP),5,-1.6366,0.0,True
+P2,4,Greedy-전체교차로,DQN,5,0.0,1.0,False
+P2,4,Greedy-전체교차로,GA-연속그룹,5,-3.2419,0.0,True
+P2,4,Greedy-전체교차로,GA-연속그룹 v3,5,-5.5761,0.0,True
+P2,4,Greedy-전체교차로,Greedy-교차로,5,0.0,1.0,False
+P2,4,Greedy-전체교차로,Grid top-K,5,20.3368,0.0,True
+P2,4,Greedy-전체교차로,PPO,5,0.0,1.0,False
+P2,4,Greedy-전체교차로,최적해(ILP),5,-2.7335,0.0,True
+P2,5,Greedy-전체교차로,DQN,5,0.0,1.0,False
+P2,5,Greedy-전체교차로,GA-연속그룹,5,-1.41,0.0,True
+P2,5,Greedy-전체교차로,GA-연속그룹 (기존 연산),5,2.1388,0.0,True
+P2,5,Greedy-전체교차로,GA-연속그룹 v3,5,-5.2948,0.0,True
+P2,5,Greedy-전체교차로,Greedy-교차로,5,-0.956,0.0,True
+P2,5,Greedy-전체교차로,Grid top-K,5,27.3699,0.0,True
+P2,5,Greedy-전체교차로,PPO,5,0.0,1.0,False
+P2,5,Greedy-전체교차로,최적해(ILP),5,-2.5225,0.0,True
+P2,6,PPO,DQN,5,-0.8375,0.0001,True
+P2,6,PPO,GA-연속그룹,5,0.797,0.0024,True
+P2,6,PPO,GA-연속그룹 v3,5,-2.9234,0.0,True
+P2,6,PPO,Greedy-교차로,5,-0.1229,0.0,True
+P2,6,PPO,Greedy-전체교차로,5,0.8319,0.0,True
+P2,6,PPO,Grid top-K,5,31.4362,0.0,True
+P2,6,PPO,최적해(ILP),5,-1.9923,0.0,True
+P2,7,PPO,DQN,5,1.9265,0.0,True
+P2,7,PPO,GA-연속그룹,5,4.0199,0.0,True
+P2,7,PPO,GA-연속그룹 v3,5,-3.4833,0.0,True
+P2,7,PPO,Greedy-교차로,5,0.1432,0.0,True
+P2,7,PPO,Greedy-전체교차로,5,1.3345,0.0,True
+P2,7,PPO,Grid top-K,5,35.7638,0.0,True
+P2,7,PPO,최적해(ILP),5,-1.503,0.0,True
+P2,8,PPO,DQN,5,2.9476,0.0,True
+P2,8,PPO,GA-연속그룹,5,3.3253,0.0,True
+P2,8,PPO,GA-연속그룹 (기존 연산),5,10.883,0.0,True
+P2,8,PPO,GA-연속그룹 v3,5,-3.603,0.0,True
+P2,8,PPO,Greedy-교차로,5,1.2854,0.0,True
+P2,8,PPO,Greedy-전체교차로,5,0.5288,0.0,True
+P2,8,PPO,Grid top-K,5,38.2586,0.0,True
+P2,8,PPO,최적해(ILP),5,-1.3932,0.0,True
+P2,9,PPO,DQN,5,1.1402,0.0,True
+P2,9,PPO,GA-연속그룹,5,-0.3264,0.0,True
+P2,9,PPO,GA-연속그룹 v3,5,-5.847,0.0,True
+P2,9,PPO,Greedy-교차로,5,-0.8802,0.0,True
+P2,9,PPO,Greedy-전체교차로,5,-0.4828,0.0,True
+P2,9,PPO,Grid top-K,5,37.5025,0.0,True
+P2,9,PPO,최적해(ILP),5,-4.963,0.0,True
 P2,10,PPO,DQN,5,1.7547,0.0,True
 P2,10,PPO,GA-연속그룹,5,4.5563,0.0,True
 P2,10,PPO,GA-연속그룹 (기존 연산),5,12.7297,0.0,True
@@ -157,70 +157,70 @@ P3,1,Greedy-교차로,Greedy-전체교차로,5,4.1105,0.0,True
 P3,1,Greedy-교차로,Grid top-K,5,0.5336,0.0048,True
 P3,1,Greedy-교차로,PPO,5,4.1105,0.0,True
 P3,1,Greedy-교차로,최적해(ILP),5,4.1105,0.0,True
-P3,2,GA-연속그룹,DQN,5,10.0522,0.0,True
-P3,2,GA-연속그룹,GA-연속그룹 v3,5,-0.908,0.0,True
-P3,2,GA-연속그룹,Greedy-교차로,5,1.6376,0.0,True
-P3,2,GA-연속그룹,Greedy-전체교차로,5,4.0281,0.0,True
-P3,2,GA-연속그룹,Grid top-K,5,4.2227,0.0,True
-P3,2,GA-연속그룹,PPO,5,4.0281,0.0,True
-P3,2,GA-연속그룹,최적해(ILP),5,4.0281,0.0,True
-P3,3,DQN,GA-연속그룹,5,-8.2256,0.0,True
-P3,3,DQN,GA-연속그룹 (기존 연산),5,7.9016,0.0,True
-P3,3,DQN,GA-연속그룹 v3,5,-9.797,0.0,True
-P3,3,DQN,Greedy-교차로,5,-6.8328,0.0,True
-P3,3,DQN,Greedy-전체교차로,5,-0.2889,0.0,True
-P3,3,DQN,Grid top-K,5,14.8042,0.0,True
-P3,3,DQN,PPO,5,-0.2889,0.0,True
-P3,3,DQN,최적해(ILP),5,-11.2774,0.0,True
-P3,4,DQN,GA-연속그룹,5,-3.5609,0.0,True
-P3,4,DQN,GA-연속그룹 v3,5,-3.1527,0.0,True
-P3,4,DQN,Greedy-교차로,5,-1.9475,0.0,True
-P3,4,DQN,Greedy-전체교차로,5,-0.2893,0.0,True
-P3,4,DQN,Grid top-K,5,18.4351,0.0,True
-P3,4,DQN,PPO,5,-0.2893,0.0,True
-P3,4,DQN,최적해(ILP),5,-11.3444,0.0,True
-P3,5,Greedy-교차로,DQN,5,-1.4557,0.0,True
-P3,5,Greedy-교차로,GA-연속그룹,5,2.8987,0.0,True
-P3,5,Greedy-교차로,GA-연속그룹 (기존 연산),5,0.0147,0.8546,False
-P3,5,Greedy-교차로,GA-연속그룹 v3,5,-0.283,0.3045,False
-P3,5,Greedy-교차로,Greedy-전체교차로,5,0.7495,0.0005,True
-P3,5,Greedy-교차로,Grid top-K,5,27.2938,0.0,True
-P3,5,Greedy-교차로,PPO,5,-1.7422,0.0,True
-P3,5,Greedy-교차로,최적해(ILP),5,-4.4769,0.0,True
-P3,6,최적해(ILP),DQN,5,3.152,0.0,True
-P3,6,최적해(ILP),GA-연속그룹,5,2.569,0.0,True
-P3,6,최적해(ILP),GA-연속그룹 v3,5,0.0472,0.0043,True
-P3,6,최적해(ILP),Greedy-교차로,5,5.4722,0.0,True
-P3,6,최적해(ILP),Greedy-전체교차로,5,2.4077,0.0,True
-P3,6,최적해(ILP),Grid top-K,5,31.2449,0.0,True
-P3,6,최적해(ILP),PPO,5,0.3002,0.0,True
-P3,7,DQN,GA-연속그룹,5,1.9689,0.0,True
-P3,7,DQN,GA-연속그룹 v3,5,-1.8385,0.0,True
-P3,7,DQN,Greedy-교차로,5,2.6139,0.0,True
-P3,7,DQN,Greedy-전체교차로,5,1.1466,0.0,True
-P3,7,DQN,Grid top-K,5,30.938,0.0,True
-P3,7,DQN,PPO,5,-0.1399,0.0,True
-P3,7,DQN,최적해(ILP),5,4.1324,0.0,True
-P3,8,최적해(ILP),DQN,5,-7.1034,0.0,True
-P3,8,최적해(ILP),GA-연속그룹,5,-5.5586,0.0,True
-P3,8,최적해(ILP),GA-연속그룹 (기존 연산),5,10.33,0.0,True
-P3,8,최적해(ILP),GA-연속그룹 v3,5,-5.571,0.0,True
-P3,8,최적해(ILP),Greedy-교차로,5,-2.4229,0.0,True
-P3,8,최적해(ILP),Greedy-전체교차로,5,-5.0582,0.0,True
-P3,8,최적해(ILP),Grid top-K,5,27.8281,0.0,True
-P3,8,최적해(ILP),PPO,5,-3.4895,0.0,True
-P3,9,Greedy-교차로,DQN,5,-1.9069,0.0,True
-P3,9,Greedy-교차로,GA-연속그룹,5,-1.6756,0.0,True
-P3,9,Greedy-교차로,GA-연속그룹 v3,5,-4.5229,0.0,True
-P3,9,Greedy-교차로,Greedy-전체교차로,5,-0.3448,0.0098,True
-P3,9,Greedy-교차로,Grid top-K,5,33.7206,0.0,True
-P3,9,Greedy-교차로,PPO,5,1.7351,0.0,True
-P3,9,Greedy-교차로,최적해(ILP),5,1.4404,0.0,True
-P3,10,최적해(ILP),DQN,5,-2.888,0.0,True
-P3,10,최적해(ILP),GA-연속그룹,5,-2.0044,0.0,True
-P3,10,최적해(ILP),GA-연속그룹 (기존 연산),5,10.1084,0.0,True
-P3,10,최적해(ILP),GA-연속그룹 v3,5,-5.5075,0.0,True
-P3,10,최적해(ILP),Greedy-교차로,5,-1.5608,0.0,True
-P3,10,최적해(ILP),Greedy-전체교차로,5,-1.4572,0.0,True
-P3,10,최적해(ILP),Grid top-K,5,34.3434,0.0,True
-P3,10,최적해(ILP),PPO,5,-1.5888,0.0,True
+P3,2,GA-연속그룹 v3,DQN,5,10.9602,0.0,True
+P3,2,GA-연속그룹 v3,GA-연속그룹,5,0.908,0.0,True
+P3,2,GA-연속그룹 v3,Greedy-교차로,5,2.5455,0.0,True
+P3,2,GA-연속그룹 v3,Greedy-전체교차로,5,4.936,0.0,True
+P3,2,GA-연속그룹 v3,Grid top-K,5,5.1306,0.0,True
+P3,2,GA-연속그룹 v3,PPO,5,4.936,0.0,True
+P3,2,GA-연속그룹 v3,최적해(ILP),5,4.936,0.0,True
+P3,3,최적해(ILP),DQN,5,11.2774,0.0,True
+P3,3,최적해(ILP),GA-연속그룹,5,3.0519,0.0,True
+P3,3,최적해(ILP),GA-연속그룹 (기존 연산),5,19.179,0.0,True
+P3,3,최적해(ILP),GA-연속그룹 v3,5,1.4804,0.0,True
+P3,3,최적해(ILP),Greedy-교차로,5,4.4446,0.0,True
+P3,3,최적해(ILP),Greedy-전체교차로,5,10.9886,0.0,True
+P3,3,최적해(ILP),Grid top-K,5,26.0816,0.0,True
+P3,3,최적해(ILP),PPO,5,10.9886,0.0,True
+P3,4,최적해(ILP),DQN,5,11.3444,0.0,True
+P3,4,최적해(ILP),GA-연속그룹,5,7.7836,0.0,True
+P3,4,최적해(ILP),GA-연속그룹 v3,5,8.1918,0.0,True
+P3,4,최적해(ILP),Greedy-교차로,5,9.3969,0.0,True
+P3,4,최적해(ILP),Greedy-전체교차로,5,11.0551,0.0,True
+P3,4,최적해(ILP),Grid top-K,5,29.7795,0.0,True
+P3,4,최적해(ILP),PPO,5,11.0551,0.0,True
+P3,5,PPO,DQN,5,0.2865,0.0,True
+P3,5,PPO,GA-연속그룹,5,4.6409,0.0,True
+P3,5,PPO,GA-연속그룹 (기존 연산),5,1.7569,0.0,True
+P3,5,PPO,GA-연속그룹 v3,5,1.4592,0.0018,True
+P3,5,PPO,Greedy-교차로,5,1.7422,0.0,True
+P3,5,PPO,Greedy-전체교차로,5,2.4917,0.0,True
+P3,5,PPO,Grid top-K,5,29.036,0.0,True
+P3,5,PPO,최적해(ILP),5,-2.7347,0.0,True
+P3,6,PPO,DQN,5,2.8518,0.0,True
+P3,6,PPO,GA-연속그룹,5,2.2688,0.0,True
+P3,6,PPO,GA-연속그룹 v3,5,-0.253,0.0,True
+P3,6,PPO,Greedy-교차로,5,5.172,0.0,True
+P3,6,PPO,Greedy-전체교차로,5,2.1075,0.0,True
+P3,6,PPO,Grid top-K,5,30.9447,0.0,True
+P3,6,PPO,최적해(ILP),5,-0.3002,0.0,True
+P3,7,PPO,DQN,5,0.1399,0.0,True
+P3,7,PPO,GA-연속그룹,5,2.1089,0.0,True
+P3,7,PPO,GA-연속그룹 v3,5,-1.6985,0.0,True
+P3,7,PPO,Greedy-교차로,5,2.7538,0.0,True
+P3,7,PPO,Greedy-전체교차로,5,1.2865,0.0,True
+P3,7,PPO,Grid top-K,5,31.0779,0.0,True
+P3,7,PPO,최적해(ILP),5,4.2724,0.0,True
+P3,8,PPO,DQN,5,-3.614,0.0,True
+P3,8,PPO,GA-연속그룹,5,-2.0692,0.0,True
+P3,8,PPO,GA-연속그룹 (기존 연산),5,13.8194,0.0,True
+P3,8,PPO,GA-연속그룹 v3,5,-2.0816,0.0,True
+P3,8,PPO,Greedy-교차로,5,1.0665,0.0001,True
+P3,8,PPO,Greedy-전체교차로,5,-1.5688,0.0,True
+P3,8,PPO,Grid top-K,5,31.3176,0.0,True
+P3,8,PPO,최적해(ILP),5,3.4895,0.0,True
+P3,9,PPO,DQN,5,-3.642,0.0,True
+P3,9,PPO,GA-연속그룹,5,-3.4107,0.0,True
+P3,9,PPO,GA-연속그룹 v3,5,-6.2579,0.0,True
+P3,9,PPO,Greedy-교차로,5,-1.7351,0.0,True
+P3,9,PPO,Greedy-전체교차로,5,-2.0799,0.0,True
+P3,9,PPO,Grid top-K,5,31.9855,0.0,True
+P3,9,PPO,최적해(ILP),5,-0.2946,0.0,True
+P3,10,PPO,DQN,5,-1.2992,0.0,True
+P3,10,PPO,GA-연속그룹,5,-0.4156,0.0,True
+P3,10,PPO,GA-연속그룹 (기존 연산),5,11.6972,0.0,True
+P3,10,PPO,GA-연속그룹 v3,5,-3.9187,0.0,True
+P3,10,PPO,Greedy-교차로,5,0.028,0.7327,False
+P3,10,PPO,Greedy-전체교차로,5,0.1316,0.0,True
+P3,10,PPO,Grid top-K,5,35.9322,0.0,True
+P3,10,PPO,최적해(ILP),5,1.5888,0.0,True
